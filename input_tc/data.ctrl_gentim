@@ -1,0 +1,20 @@
+ &CTRL_NML
+ doPackDiag = .FALSE.,
+ /
+ &CTRL_PACKNAMES
+ /
+ &CTRL_NML_GENARR
+  xx_genarr2d_file(1)   = 'xx_bglen',
+  xx_genarr2d_weight(1) = 'wunit',
+  xx_genarr2d_file(2)   = 'xx_beta',
+  xx_genarr2d_weight(2) = 'wunit',
+  xx_genarr2d_file(3)   = 'xx_ubdryflux',
+  xx_genarr2d_weight(3) = 'wunit',
+  xx_genarr2d_file(4)   = 'xx_vbdryflux',
+  xx_genarr2d_weight(4) = 'wunit',
+  xx_genarr2d_file(5)   = 'xx_bdot_depth',
+  xx_genarr2d_weight(5) = 'wunit',
+#  xx_genarr2d_file(6)   = 'xx_bdot_max',
+#  xx_genarr2d_weight(6) = 'wunit',
+  genarr2dPrecond = 1.0 1.0 1.0 1.0 1.e3 
+ /
