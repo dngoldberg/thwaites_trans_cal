@@ -74,7 +74,6 @@ end
 vx0=vx;
 vy0=vy;
 
-contourf(vx); colorbar
 
 vx(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
 vy(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
@@ -93,11 +92,15 @@ for i=1:length(years);
 	eval(str)
 	str = ['surftemp = surf + dH_T' num2str(years(i)) '_cpom;'];
 	eval(str)
-	surftemp(dhT>(-1*years(i)) | ~mask_cost) = nan;
+%	surftemp(dhT>(-.25*years(i)) | ~mask_cost) = nan;
+	surftemp(~mask_cost) = nan;
 	surftemp(Y<-561e3 | X>-1350e3) = nan;
 	surftemp(isnan(surftemp)) = -999999;
         surftemp = [[surftemp zeros(ny,gx)];zeros(gy,nx+gx)];
-	binwrite(['surface_constraints/CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp');
+        dhT = [[dhT zeros(ny,gx)];zeros(gy,nx+gx)];
+	dhT(surftemp==-99999) = -999999;
+	binwrite(['surface_constraints/full_CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp');
+	binwrite(['surface_constraints/full_CPOM_dh'  appNum(timesteps_per_year*years(i),10) '.bin'],dhT');
 end
 
 %vx(isnan(v) | mask_dom==0 | isnan(verrstd)) = -999999;
@@ -223,6 +226,8 @@ faketopog = -1000*ones(ny,nx);
 faketopog([1 end],:) = 0;
 faketopog(:,[1 end]) = 0;
 faketopog(~mask)=0;
+singleton_mask = zeros(ny,nx);
+singleton_mask(1,1) = 1;
 
 
 %%%%% VFACE VELOCITY AND MASK
@@ -262,6 +267,7 @@ ufacevel(isnan(ufacevel))=0;
 
 ufacemask(mask_vel_west==1) = 4;
 ufacemask(mask_vel_east==1) = 4;
+
 
 %%%%%%%%%%%%%%
 
@@ -322,6 +328,9 @@ binwrite('BglenPattyn.bin',Bbar');
 
 Bbar2 = [[Bbar2 zeros(ny,gx)];zeros(gy,nx+gx)];
 binwrite('BglenPattynMask.bin',Bbar2');
+
+sngl = [[singleton_mask zeros(ny,gx)];zeros(gy,nx+gx)];
+binwrite('SingletonMask.bin',sngl');
 
 binwrite('delX.bin',[diffx ones(1,gx)]);
 binwrite('delY.bin',[diffy ones(1,gy)]);

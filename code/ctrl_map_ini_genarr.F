@@ -224,22 +224,22 @@ C--   to 3 generic 2D control arrays
 #endif
       CALL CTRL_MAP_GENARR2D( v_flux_bdry_SI, iarr, myThid )
       endif
-      if(iarr .eq. 6) then
-#ifdef ALLOW_OPENAD
-       streamice_bdot_depth_maxmelt_pv(1,1,1,1) = 
-     &  streamice_bdot_depth_maxmelt_pv(1,1,1,1) +
-     &  0.0 * xx_genarr2d_dummy(iarr)
-#endif
-      CALL CTRL_MAP_GENARR2D( streamice_bdot_depth_maxmelt_pv, 
-     &  iarr, myThid )
-      endif
       if(iarr .eq. 5) then
 #ifdef ALLOW_OPENAD
        streamice_bdot_maxmelt_pv(1,1,1,1) = 
      &  streamice_bdot_maxmelt_pv(1,1,1,1) +
      &  0.0 * xx_genarr2d_dummy(iarr)
 #endif
-      CALL CTRL_MAP_GENARR2D( streamice_bdot_maxmelt_pv, 
+      CALL CTRL_MAP_GENARR2D( streamice_bdot_maxmelt_v, 
+     &  iarr, myThid )
+      endif
+      if(iarr .eq. 6) then
+#ifdef ALLOW_OPENAD
+       streamice_bdot_depth_maxmelt_pv(1,1,1,1) = 
+     &  streamice_bdot_depth_maxmelt_pv(1,1,1,1) +
+     &  0.0 * xx_genarr2d_dummy(iarr)
+#endif
+      CALL CTRL_MAP_GENARR2D( streamice_bdot_depth_maxmelt_v, 
      &  iarr, myThid )
       endif
       enddo
