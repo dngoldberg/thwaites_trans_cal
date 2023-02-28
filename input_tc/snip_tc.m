@@ -45,6 +45,12 @@ firn = interpBedmachineAntarctica(X,Y,'firn','linear','/totten_1/ModelData/Antar
 geoid = interpBedmachineAntarctica(X,Y,'geoid','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 maskbm = interpBedmachineAntarctica(X,Y,'mask','nearest','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 smb = interpRACMOant(X,Y);
+[dh_paolo dh_paolo_fil T_out] = interpPaolo2015(X(:), Y(:), [2004:2011]');
+dh_paolo_rec = zeros(length(y_mesh_mid),length(x_mesh_mid),size(dh_paolo,3));
+for i=1:size(dh_paolo,3);
+ dh_paolo_rec(:,:,i) = reshape(dh_paolo(:,i),length(y_mesh_mid),length(x_mesh_mid));
+end
+dh_paolo = squeeze(sum(dh_paolo_rec,3));
 
 nx = length(x_mesh_mid);
 YEARS=[2009:2017]';

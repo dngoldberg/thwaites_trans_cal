@@ -92,14 +92,18 @@ for i=1:length(years);
 	eval(str)
 	str = ['surftemp = surf + dH_T' num2str(years(i)) '_cpom;'];
 	eval(str)
-%	surftemp(dhT>(-.25*years(i)) | ~mask_cost) = nan;
 	surftemp(~mask_cost) = nan;
+%	surftemp(dhT>(-.25*years(i)) | ~mask_cost) = nan;
 	surftemp(Y<-561e3 | X>-1350e3) = nan;
 	surftemp(isnan(surftemp)) = -999999;
+	surftemp2 = surftemp;
+	surftemp2(dhT>(-.5*years(i))) = -999999;
         surftemp = [[surftemp zeros(ny,gx)];zeros(gy,nx+gx)];
+        surftemp2 = [[surftemp2 zeros(ny,gx)];zeros(gy,nx+gx)];
         dhT = [[dhT zeros(ny,gx)];zeros(gy,nx+gx)];
 	dhT(surftemp==-99999) = -999999;
 	binwrite(['surface_constraints/full_CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp');
+	binwrite(['surface_constraints/CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp2');
 	binwrite(['surface_constraints/full_CPOM_dh'  appNum(timesteps_per_year*years(i),10) '.bin'],dhT');
 end
 
@@ -163,13 +167,13 @@ mask(thick<0 & mask~=1) = 1;
 % MASK is -1 where ice is less then 2m (to avoid ill conditioning)
 % 
 
+%mask = zeros(size(surf));
+%    mask(surf>0)=2;
+%    mask(maskbm==1)=1;
+%    mask(surf<0)=0;
+%    surf(surf<0)=0;
+
 hmask = ones(size(thick));
-%hmask(thick>0) = 1;
-%hmask(thick<10 & gr==1)=-1;
-%hmask(:,[1 end])=-1;
-%hmask([1 end],:)=-1;
-%hmask(surf>2000)=-1;
-oce_mask = (surf==0);
 hmask(mask==1)=-1;
 hmask(surf==0 & mask~=1)=0;
 hmask([1 end],:) = -1;
