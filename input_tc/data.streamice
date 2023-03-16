@@ -35,8 +35,8 @@
  STREAMICEglenconstfile = 'BglenPattyn.bin',
 # STREAMICEbasaltracFile = 'Beta2009_30.bin',
  streamicehmaskfile = 'hmask.bin',
- STREAMICEuFaceBdryFile = 'ufacemask_dirich.bin',
- STREAMICEvFaceBdryFile = 'vfacemask_dirich.bin',
+ STREAMICEuFaceBdryFile = 'ufacemask.bin',
+ STREAMICEvFaceBdryFile = 'vfacemask.bin',
  STREAMICEuMassFluxFile = 'ufluxdirich.bin',
  STREAMICEvMassFluxFile = 'vfluxdirich.bin',
  STREAMICE_diagnostic_only=.true.,
@@ -45,6 +45,7 @@
  streamice_bdot_depth_maxmelt = -600.
  streamice_bdot_maxmelt = 5.
  streamice_bdot_exp = 1.
+ STREAMICEcostMaskFile = ''
 # streamice_vel_ext = .true.
 # STREAMICE_uvel_ext_file = 'uext.bin'
 # STREAMICE_vvel_ext_file = 'vext.bin'
@@ -73,7 +74,7 @@
  streamice_wgt_tikh_bglen = 5.e5
  streamice_wgt_tikh_beta = 5.e5
  streamice_wgt_surf = 1.0
- streamice_wgt_prior_bglen = .001
+ streamice_wgt_prior_bglen = .0001
  STREAMICEvelOptimTCBasename = 'velocity_constraints/velobsMoug'
  STREAMICEvelOptimSnapBasename = 'velobsSnap'
  STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOM_surf'
@@ -83,7 +84,6 @@
 # streamice_vel_cost_timesteps = 90 108 126 144 162 180 198 216 234
 # streamice_surf_cost_timesteps = 54 144 234
 # streamice_vel_cost_timesteps = 90 108 126 144 162 180 198 216 234
-# streamice_surf_cost_timesteps = 54 144 234
  streamice_vel_cost_timesteps = 60 72 84 96 108 120 132 144 156
  streamice_surf_cost_timesteps = 36 96 156
  &

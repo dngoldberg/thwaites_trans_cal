@@ -152,46 +152,46 @@ C--   generic - user-defined control vars
 
 C---  begin customized code for experiment halfpipe_streamice:
 
-!        DO bj=myByLo(myThid),myByHi(myThid)
-!         DO bi=myBxLo(myThid),myBxHi(myThid)
-!          LOCsumTile(bi,bj)=0. _d 0
-!          DO j = 1,sNy
-!           DO i = 1,sNx
-!             LOCsumTile(bi,bj) = LOCsumTile(bi,bj)
-!     &          + rA(i,j,bi,bj)
-!     &           *maskInC(i,j,bi,bj)
-!           ENDDO
-!          ENDDO
-!         ENDDO
-!        ENDDO
-
-!        CALL GLOBAL_SUM_TILE_RL( LOCsumTile, LOCsumGlob, myThid )
-!        itot_area = 1.0/LOCsumGlob
-
-
-        IF ( iarr .LE. 2 ) THEN
+        IF ( iarr .EQ. 1 ) THEN
          DO bj=myByLo(myThid),myByHi(myThid)
           DO bi=myBxLo(myThid),myBxHi(myThid)
-           LOCsumTile(bi,bj)=0. _d 0
-           DO j = 1,sNy
-            DO i = 1,sNx
-             LOCsumTile(bi,bj) = LOCsumTile(bi,bj)
-     &          + xx_gentim2d(i,j,bi,bj,iarr)*rA(i,j,bi,bj)
-     &           *maskInC(i,j,bi,bj) 
+           DO j = 1-OLy,sNy+OLy
+            DO i = 1-OLx,sNx+OLx
+             streamice_bdot_maxmelt_v(i,j,bi,bj) = 
+     &        xx_gentim2d(i,j,bi,bj,iarr)
             ENDDO
            ENDDO
           ENDDO
          ENDDO
-
-         CALL GLOBAL_SUM_TILE_RL( LOCsumTile, LOCsumGlob, myThid )
-         LOCsumGlob = LOCsumGlob/globalArea
-
-         if (iarr.eq.1) then
-          streamice_bdot_depth_maxmelt_p = LOCsumGlob
-         elseif (iarr.eq.2) then
-          streamice_bdot_maxmelt_p = LOCsumGlob
-         endif
-
+         CALL EXCH_XY_RL( streamice_bdot_maxmelt_v, myThid )
+        ENDIF
+        IF ( iarr .EQ. 2 ) THEN
+         DO bj=myByLo(myThid),myByHi(myThid)
+          DO bi=myBxLo(myThid),myBxHi(myThid)
+           DO j = 1-OLy,sNy+OLy
+            DO i = 1-OLx,sNx+OLx
+             B_glen(i,j,bi,bj) = 
+     &        xx_gentim2d(i,j,bi,bj,iarr)+
+     &        B_glen_init(i,j,bi,bj)
+            ENDDO
+           ENDDO
+          ENDDO
+         ENDDO
+         CALL EXCH_XY_RL( B_glen, myThid )
+        ENDIF
+        IF ( iarr .EQ. 3 ) THEN
+         DO bj=myByLo(myThid),myByHi(myThid)
+          DO bi=myBxLo(myThid),myBxHi(myThid)
+           DO j = 1-OLy,sNy+OLy
+            DO i = 1-OLx,sNx+OLx
+             C_basal_friction(i,j,bi,bj) = 
+     &        xx_gentim2d(i,j,bi,bj,iarr)+
+     &        C_basal_fric_init(i,j,bi,bj)
+            ENDDO
+           ENDDO
+          ENDDO
+         ENDDO
+         CALL EXCH_XY_RL( C_basal_friction, myThid )
         ENDIF
 C---  end customized code
 

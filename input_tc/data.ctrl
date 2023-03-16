@@ -1,5 +1,5 @@
  &CTRL_NML
- doPackDiag = .FALSE.,
+ doPackDiag = .TRUE.,
  /
  &CTRL_PACKNAMES
  /

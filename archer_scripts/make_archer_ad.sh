@@ -26,14 +26,14 @@ PETSCDIR=/work/n02/n02/dngoldbe/petsc/
 export LD_LIBRARY_PATH=/work/n02/n02/dngoldbe/petsc/lib:$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 if [ $1 == "genarr" ]; then
-	numgen=5
+	numgen=3
 	numtim=0
 elif [ $1 == "snap" ]; then 
         numgen=2
         numtim=0
 elif [ $1 == "gentim" ]; then
-        numgen=4
-        numtim=2
+        numgen=0
+        numtim=3
 fi
 
 code_dir=code

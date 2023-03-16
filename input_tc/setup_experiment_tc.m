@@ -86,6 +86,7 @@ verrstd(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
 !rm surface_constraints/*
 % dH_T3_cpom dH_T8_cpom dH_T13_cpom
 years=[3 8 13];
+Ismith = ~isnan(dhdtSmith);
 for i=1:length(years);
 	yr = num2str(years(i));
 	str = ['dhT = dH_T' num2str(years(i)) '_cpom;'];
@@ -93,19 +94,37 @@ for i=1:length(years);
 	str = ['surftemp = surf + dH_T' num2str(years(i)) '_cpom;'];
 	eval(str)
 	surftemp(~mask_cost) = nan;
-%	surftemp(dhT>(-.25*years(i)) | ~mask_cost) = nan;
 	surftemp(Y<-561e3 | X>-1350e3) = nan;
+
 	surftemp(isnan(surftemp)) = -999999;
+        surftemp_smith = surftemp;
+	surftemp_smith(Ismith) = ...
+		surf(Ismith) + years(i)*dhdtSmith(Ismith);
+	surftemp_smith(isnan(surftemp_smith)) = -999999;
+
 	surftemp2 = surftemp;
 	surftemp2(dhT>(-.3*years(i))) = -999999;
         surftemp = [[surftemp zeros(ny,gx)];zeros(gy,nx+gx)];
+        surftemp_smith = [[surftemp_smith zeros(ny,gx)];zeros(gy,nx+gx)];
         surftemp2 = [[surftemp2 zeros(ny,gx)];zeros(gy,nx+gx)];
         dhT = [[dhT zeros(ny,gx)];zeros(gy,nx+gx)];
 	dhT(surftemp==-99999) = -999999;
+        errCpom = ones(ny,nx);
+        errCpomSmith = errCpom; 
+        errCpomSmith(Ismith) = .1;
+	errCpomSmith = [[errCpomSmith zeros(ny,gx)];zeros(gy,nx+gx)];
+
+
 	binwrite(['surface_constraints/full_CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp');
+        binwrite(['surface_constraints/CPOM_surf' appNum(timesteps_per_year*years(i),10) 'err.bin'],errCpomSmith');
+	binwrite(['surface_constraints/full_CPOMSmith_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp_smith');
+        binwrite(['surface_constraints/CPOMSmith_surf' appNum(timesteps_per_year*years(i),10) 'err.bin'],errCpomSmith');
+
 	binwrite(['surface_constraints/CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp2');
 	binwrite(['surface_constraints/full_CPOM_dh'  appNum(timesteps_per_year*years(i),10) '.bin'],dhT');
+
 end
+
 
 %vx(isnan(v) | mask_dom==0 | isnan(verrstd)) = -999999;
 %vy(isnan(v) | mask_dom==0 | isnan(verrstd)) = -999999;

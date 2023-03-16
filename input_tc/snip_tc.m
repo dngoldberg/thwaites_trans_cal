@@ -45,12 +45,24 @@ firn = interpBedmachineAntarctica(X,Y,'firn','linear','/totten_1/ModelData/Antar
 geoid = interpBedmachineAntarctica(X,Y,'geoid','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 maskbm = interpBedmachineAntarctica(X,Y,'mask','nearest','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 smb = interpRACMOant(X,Y);
-[dh_paolo dh_paolo_fil T_out] = interpPaolo2015(X(:), Y(:), [2004:2011]');
-dh_paolo_rec = zeros(length(y_mesh_mid),length(x_mesh_mid),size(dh_paolo,3));
-for i=1:size(dh_paolo,3);
- dh_paolo_rec(:,:,i) = reshape(dh_paolo(:,i),length(y_mesh_mid),length(x_mesh_mid));
-end
-dh_paolo = squeeze(sum(dh_paolo_rec,3));
+%[dh_paolo dh_paolo_fil T_out] = interpPaolo2015(X(:), Y(:), [2004:2011]');
+%dh_paolo_rec = zeros(length(y_mesh_mid),length(x_mesh_mid),size(dh_paolo,3));
+%for i=1:size(dh_paolo,3);
+% dh_paolo_rec(:,:,i) = reshape(dh_paolo(:,i),length(y_mesh_mid),length(x_mesh_mid));
+%end
+%dh_paolo = squeeze(sum(dh_paolo_rec,3));
+
+% get smith 2020 ice shelf thinning
+[Asmith R]=geotiffread('/totten_1/ModelData/Antarctica/DHDTSmith/ais_floating.tif');
+% get georeferencing
+Asmith = flipud(double(Asmith));
+xsmith = R.XWorldLimits(1):R.CellExtentInWorldX:R.XWorldLimits(2);
+ysmith = R.YWorldLimits(1):R.CellExtentInWorldY:R.YWorldLimits(2);
+xsmith = .5 * (xsmith(1:end-1) + xsmith(2:end));
+ysmith = .5 * (ysmith(1:end-1) + ysmith(2:end));
+dhdtSmith = interp2(xsmith,ysmith,Asmith,X,Y,'nearest');
+dhdtSmith(Y>-5e5) = nan;
+
 
 nx = length(x_mesh_mid);
 YEARS=[2009:2017]';
@@ -79,7 +91,7 @@ firn(nofirn) = InvDistWeighting(X(hasfirn),Y(hasfirn),firn(hasfirn),...
 
 
 
-save temp_data.mat bed firn geoid YEARS surf x_mesh_mid y_mesh_mid mask_dom dH_T3_cpom dH_T8_cpom dH_T13_cpom smb diffx diffy verrstd vx vy v maskbm bmthick mask_cost
+save temp_data.mat bed firn geoid YEARS surf x_mesh_mid y_mesh_mid mask_dom dH_T3_cpom dH_T8_cpom dH_T13_cpom smb diffx diffy verrstd vx vy v maskbm bmthick mask_cost dhdtSmith
 
 %surf = interpBedmachineAntarctica(X,Y,'surface');
 %thick = interpBedmachineAntarctica(X,Y,'thickness');

@@ -17,7 +17,7 @@ module load cray-netcdf-hdf5parallel/4.7.4.3
 if [ $2 == 'snap' ]; then
         run_folder="run_ad_$1_$2"
 else
-        run_folder="run_ad_$1_$2_$3"
+        run_folder="run_ad_$1_$2_$3_$4$5$6"
 fi
 
 cd $SLURM_SUBMIT_DIR/../$run_folder

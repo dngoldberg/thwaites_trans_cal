@@ -5,13 +5,15 @@
 
 code_dir=code
 input_dir=../input/
+
+
 if [ $2 == 'snap' ]; then
 	build_dir=build_snap
         run_folder="run_ad_$1_$2"
 	cd $input_dir; 
 	cd $OLDPWD
 else
-        run_folder="run_ad_$1_$2_$3"
+        run_folder="run_ad_$1_$2_$3_$4$5$6"
 	if [ $3 == 'genarr' ]; then
 		build_dir=build_genarr
 	        cd $input_dir; 
@@ -59,8 +61,11 @@ mv data.streamice.temp data.streamice
 sed "s/.*smooth_gl_width.*/$strsmooth/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
+timestep=2592000
+ntimesteps=96
+
 if [ $2 == 'snap' ]; then
-	strdt=' deltaT=1728000.0,'
+	strdt=" deltaT=$timestep,"
 	strtimestep=' nTimesteps=1,'
 	strdiagnost=' STREAMICE_diagnostic_only=.true.,'
         strbetaconfig="STREAMICEbasalTracConfig='UNIFORM',"
@@ -69,8 +74,8 @@ if [ $2 == 'snap' ]; then
 	rm data.ctrl
 	ln -s data.ctrl_snap data.ctrl
 else
-	strdt=' deltaT=1728000.0,'
-	strtimestep=' nTimesteps=144,'
+	strdt=" deltaT=$timestep,"
+	strtimestep=" nTimesteps=$ntimesteps,"
 	strdiagnost=' STREAMICE_diagnostic_only=.false.,'
         strbetaconfig=" STREAMICEbasalTracConfig='FILE',"
 	strtc=" STREAMICE_do_timedep_cost = .true."
@@ -80,7 +85,22 @@ else
 	 ln -s data.ctrl_genarr data.ctrl
 	else
 	 rm data.ctrl
-         ln -s data.ctrl_gentim data.ctrl
+         cp -r $input_dir/data.ctrl_gentim data.ctrl
+
+         gentimperiod1=$(($4*$timestep*$ntimesteps/2))
+         gentimperiod2=$(($5*$timestep*$ntimesteps/2))
+         gentimperiod3=$(($6*$timestep*$ntimesteps/2))
+
+         StrPeriod="  xx_gentim2d_period(1) = $gentimperiod1"
+         sed "s/.*xx_gentim2d_period(1).*/$StrPeriod/" data.ctrl > data.ctrl.temp; 
+	 mv data.ctrl.temp data.ctrl;
+         StrPeriod="  xx_gentim2d_period(2) = $gentimperiod2"
+         sed "s/.*xx_gentim2d_period(2).*/$StrPeriod/" data.ctrl > data.ctrl.temp; 
+	 mv data.ctrl.temp data.ctrl;
+         StrPeriod="  xx_gentim2d_period(3) = $gentimperiod3"
+         sed "s/.*xx_gentim2d_period(3).*/$StrPeriod/" data.ctrl > data.ctrl.temp; 
+	 mv data.ctrl.temp data.ctrl;
+
 	fi
 
         ln -s ../archer_scripts/get_beta_bglen.py .
@@ -101,6 +121,7 @@ else
 
 fi
 
+
 sed "s/.*deltaT.*/$strdt/" data > data.streamice.temp
 mv data.streamice.temp data
 sed "s/.*nTimesteps.*/$strtimestep/" data > data.streamice.temp
@@ -114,6 +135,7 @@ mv data.streamice.temp data.streamice
 sed "s/.*snapshot_cost.*/$strsnap/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
+cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
 
 # Link executables
 
@@ -135,14 +157,14 @@ if [ ! -d "$optimdir" ]; then
 fi
 
 if [ $3 == "genarr" ]; then
-	numgen=5
+	numgen=3
 	numtim=0
 elif [ $2 == "snap" ]; then 
         numgen=2
         numtim=0
 elif [ $3 == "gentim" ]; then
-        numgen=4
-        numtim=2
+        numgen=0
+        numtim=3
 fi
 
 strgen="      parameter ( maxCtrlArr2D = $numgen )"
