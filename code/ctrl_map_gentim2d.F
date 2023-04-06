@@ -153,16 +153,66 @@ C--   generic - user-defined control vars
 C---  begin customized code for experiment halfpipe_streamice:
 
         IF ( iarr .EQ. 1 ) THEN
-         DO bj=myByLo(myThid),myByHi(myThid)
-          DO bi=myBxLo(myThid),myBxHi(myThid)
-           DO j = 1-OLy,sNy+OLy
-            DO i = 1-OLx,sNx+OLx
-             streamice_bdot_maxmelt_v(i,j,bi,bj) = 
-     &        xx_gentim2d(i,j,bi,bj,iarr)
+
+         IF (STREAMICE_use_global_ctrl) then
+
+          DO bj=myByLo(myThid),myByHi(myThid)
+           DO bi=myBxLo(myThid),myBxHi(myThid)
+           LOCsumTile(bi,bj)=0. _d 0
+            DO j = 1,sNy
+             DO i = 1,sNx
+              LOCsumTile(bi,bj) = LOCsumTile(bi,bj)
+     &          + rA(i,j,bi,bj)*maskInC(i,j,bi,bj)
+             ENDDO
             ENDDO
            ENDDO
           ENDDO
-         ENDDO
+
+          CALL GLOBAL_SUM_TILE_RL( LOCsumTile, LOCsumGlob, myThid )
+          itot_area = 1.0/LOCsumGlob
+
+
+          DO bj=myByLo(myThid),myByHi(myThid)
+           DO bi=myBxLo(myThid),myBxHi(myThid)
+            LOCsumTile(bi,bj)=0. _d 0
+            DO j = 1,sNy
+             DO i = 1,sNx
+              LOCsumTile(bi,bj) = LOCsumTile(bi,bj)
+     &          + rA(i,j,bi,bj) * maskInC(i,j,bi,bj)
+     &            * xx_gentim2d(i,j,bi,bj,iarr)
+     &            * itot_area
+             ENDDO
+            ENDDO
+           ENDDO
+          ENDDO
+
+          CALL GLOBAL_SUM_TILE_RL( LOCsumTile, LOCsumGlob, myThid )
+
+          DO bj=myByLo(myThid),myByHi(myThid)
+           DO bi=myBxLo(myThid),myBxHi(myThid)
+            DO j = 1-OLy,sNy+OLy
+             DO i = 1-OLx,sNx+OLx
+              streamice_bdot_maxmelt_v(i,j,bi,bj) =
+     &         LOCsumGlob
+             ENDDO
+            ENDDO
+           ENDDO
+          ENDDO
+
+         ELSE
+
+          DO bj=myByLo(myThid),myByHi(myThid)
+           DO bi=myBxLo(myThid),myBxHi(myThid)
+            DO j = 1-OLy,sNy+OLy
+             DO i = 1-OLx,sNx+OLx
+              streamice_bdot_maxmelt_v(i,j,bi,bj) = 
+     &         xx_gentim2d(i,j,bi,bj,iarr)
+             ENDDO
+            ENDDO
+           ENDDO
+          ENDDO
+
+         ENDIF
          CALL EXCH_XY_RL( streamice_bdot_maxmelt_v, myThid )
         ENDIF
         IF ( iarr .EQ. 2 ) THEN

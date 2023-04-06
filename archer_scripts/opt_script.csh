@@ -5,7 +5,7 @@
 #
 
 #nprocs=128
-itermax=25
+itermax=30
 procsonnode=128
 
 
@@ -73,6 +73,7 @@ done
 
 rm tapelev*
 rm oad_cp*
+rm ecco_c*
 
 exit
 

@@ -24,8 +24,8 @@ PETSCDIR=/work/n02/n02/dngoldbe/petsc/
 # module load ncview/ncview-2.1.7-gcc-10.1.0
 
 export LD_LIBRARY_PATH=/work/n02/n02/dngoldbe/petsc/lib:$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
-build_dir=build_forward
-code_dir=code_forward
+build_dir=build_validate
+code_dir=code_validate
 
 if [ -d "../$build_dir" ]; then
   cd ../$build_dir
@@ -38,14 +38,14 @@ fi
 
 
 cd $ROOTDIR
-git checkout master
+git checkout branch_controls_snap_tc
 cd $OLDPWD
 
 
 
 
 make CLEAN
-$ROOTDIR/tools/genmake2 -mods='../code_forward' -of=$HOME/own_scripts/dev_linux_amd64_cray_archer2_oad -mpi
+$ROOTDIR/tools/genmake2 -mods="../$code_dir" -of=$HOME/own_scripts/dev_linux_amd64_cray_archer2_oad -mpi
 #$ROOTDIR/tools/genmake2 -ieee -mods='../code ../newcode' -of=$ROOTDIR/tools/build_options/linux_amd64_gfortran -mpi
 #$ROOTDIR/tools/genmake2 -mods='../code' -mpi
 echo $LD_LIBRARY_PATH

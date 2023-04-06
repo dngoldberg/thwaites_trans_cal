@@ -41,11 +41,17 @@
  STREAMICEvMassFluxFile = 'vfluxdirich.bin',
  STREAMICE_diagnostic_only=.true.,
  streamice_allow_reg_coulomb = .false.
- streamice_bdot_depth_nomelt = -100.
- streamice_bdot_depth_maxmelt = -600.
- streamice_bdot_maxmelt = 5.
+ streamice_bdot_depth_nomelt = -300.
+ streamice_bdot_depth_maxmelt = -700.
+ streamice_bdot_maxmelt = 50.
  streamice_bdot_exp = 1.
  STREAMICEcostMaskFile = ''
+ STREAMICE_use_global_ctrl = .false.
+ STREAMICEBdotMaxMeltFile = ''
+ bdotMaxmeltTimeDepFile = ''
+ bglenTimeDepFile=''
+ cfricTimeDepFile=''
+# streamice_forcing_period = 0.
 # streamice_vel_ext = .true.
 # STREAMICE_uvel_ext_file = 'uext.bin'
 # STREAMICE_vvel_ext_file = 'vext.bin'
@@ -73,6 +79,7 @@
 # streamice_wgt_vel_norm = 1.0e2
  streamice_wgt_tikh_bglen = 5.e5
  streamice_wgt_tikh_beta = 5.e5
+ streamice_wgt_tikh_gen = 2.5e4
  streamice_wgt_surf = 1.0
  streamice_wgt_prior_bglen = .0001
  STREAMICEvelOptimTCBasename = 'velocity_constraints/velobsMoug'
@@ -81,9 +88,6 @@
  STREAMICEBglenCostMaskFile = 'BglenPattynMask.bin'
  STREAMICE_do_timedep_cost = .false.
  STREAMICE_do_snapshot_cost = .true.
-# streamice_vel_cost_timesteps = 90 108 126 144 162 180 198 216 234
-# streamice_surf_cost_timesteps = 54 144 234
-# streamice_vel_cost_timesteps = 90 108 126 144 162 180 198 216 234
  streamice_vel_cost_timesteps = 60 72 84 96 108 120 132 144 156
  streamice_surf_cost_timesteps = 36 96 156
  &

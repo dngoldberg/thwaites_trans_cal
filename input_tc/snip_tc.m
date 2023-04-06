@@ -61,7 +61,23 @@ ysmith = R.YWorldLimits(1):R.CellExtentInWorldY:R.YWorldLimits(2);
 xsmith = .5 * (xsmith(1:end-1) + xsmith(2:end));
 ysmith = .5 * (ysmith(1:end-1) + ysmith(2:end));
 dhdtSmith = interp2(xsmith,ysmith,Asmith,X,Y,'nearest');
-dhdtSmith(Y>-5e5) = nan;
+dhdtSmith(Y<-5e5) = nan;
+
+[Anoel R]=geotiffread('../data/basal_melt_map_racmo_firn_air_added_PT.tif');
+% get georeferencing
+Anoel = flipud(double(Anoel));
+xnoel = R.XWorldLimits(1):R.CellExtentInWorldX:R.XWorldLimits(2);
+ynoel = R.YWorldLimits(1):R.CellExtentInWorldY:R.YWorldLimits(2);
+xnoel = .5 * (xnoel(1:end-1) + xnoel(2:end));
+ynoel = .5 * (ynoel(1:end-1) + ynoel(2:end));
+
+[xnoel ynoel] = meshgrid(xnoel,ynoel);
+Hnoel = interpBedmachineAntarctica(xnoel,ynoel,'thickness','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
+Snoel = interpBedmachineAntarctica(xnoel,ynoel,'surface','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
+Hnoel(ynoel<-3.75e5) = nan;
+Anoel(ynoel<-3.75e5) = nan;
+Bnoel = Snoel-Hnoel;
+
 
 
 nx = length(x_mesh_mid);
@@ -76,6 +92,7 @@ end
 
 load /totten_1/ModelData/Antarctica/Bamber2009DEM/krigged_dem_nsidc.mat
 surf = interp2(x,y,surfacedem,X,Y);
+return
 
 load /totten_1/ModelData/Antarctica/CPOM_dhdt/dH_cpom_interpolants.mat
 dH_T3_cpom = dH_T3(X,Y);

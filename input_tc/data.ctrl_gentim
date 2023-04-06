@@ -13,5 +13,5 @@
   xx_gentim2d_file(3)   = 'xx_beta',
   xx_gentim2d_weight(3) = 'wunit',
   xx_gentim2d_period(3) = 0.0
-  gentim2dPrecond = 0.25 1.0 1.0
+  gentim2dPrecond = 5.0 1.0 1.0
  /

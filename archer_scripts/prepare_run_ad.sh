@@ -13,7 +13,7 @@ if [ $2 == 'snap' ]; then
 	cd $input_dir; 
 	cd $OLDPWD
 else
-        run_folder="run_ad_$1_$2_$3_$4$5$6"
+        run_folder="run_ad_$1_$2_$3_$4$5$6$7"
 	if [ $3 == 'genarr' ]; then
 		build_dir=build_genarr
 	        cd $input_dir; 
@@ -87,7 +87,21 @@ else
 	 rm data.ctrl
          cp -r $input_dir/data.ctrl_gentim data.ctrl
 
-         gentimperiod1=$(($4*$timestep*$ntimesteps/2))
+         if [ $4 == 1 ]; then
+	  gentimperiod1=$(($4*$timestep*$ntimesteps/2))
+         elif [ $4 == 0 ]; then
+	  gentimperiod1=0
+	 elif [ $4 == G ]; then
+	  gentimperiod1=$(($timestep*$ntimesteps/2))
+	  strglob=" STREAMICE_use_global_ctrl = .true."
+	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
+	  mv data.streamice.temp data.streamice
+	 elif [ $4 == g ]; then
+	  gentimperiod1=0
+	  strglob=" STREAMICE_use_global_ctrl = .true."
+	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
+	  mv data.streamice.temp data.streamice
+	 fi
          gentimperiod2=$(($5*$timestep*$ntimesteps/2))
          gentimperiod3=$(($6*$timestep*$ntimesteps/2))
 
@@ -102,6 +116,17 @@ else
 	 mv data.ctrl.temp data.ctrl;
 
 	fi
+
+	if [ $# == 7 ];  then
+
+	if [ $7 == 'S' ]; then
+	 echo "DOING SHELF CONSTRAINTS"
+	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
+	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
+	 mv data.streamice.temp data.streamice
+	fi
+
+        fi
 
         ln -s ../archer_scripts/get_beta_bglen.py .
 	if [ $1 == 'coul' ]; then

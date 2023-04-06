@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --time=8:00:00
+#SBATCH --time=10:00:00
 #SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=100
@@ -17,7 +17,7 @@ module load cray-netcdf-hdf5parallel/4.7.4.3
 if [ $2 == 'snap' ]; then
         run_folder="run_ad_$1_$2"
 else
-        run_folder="run_ad_$1_$2_$3_$4$5$6"
+        run_folder="run_ad_$1_$2_$3_$4$5$6$7"
 fi
 
 cd $SLURM_SUBMIT_DIR/../$run_folder
