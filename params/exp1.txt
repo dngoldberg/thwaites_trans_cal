@@ -1,0 +1,8 @@
+Sliding: coul
+Timedep: tc
+MeltType: g
+GlenType: 0
+BetaType: 0
+Smith: NS
+BigConstr: surf
+gentim: gentim

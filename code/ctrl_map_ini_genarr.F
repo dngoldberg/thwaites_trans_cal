@@ -196,14 +196,14 @@ C--   begin customized code for experiment halfpipe_streamice
 C--   An example of connecting specific fields
 C--   to 3 generic 2D control arrays
       do iarr = 1,maxCtrlArr2D
-      if(iarr .eq. 2) then
+      if(iarr .eq. 1) then
 #ifdef ALLOW_OPENAD
        B_glen(1,1,1,1) = B_glen(1,1,1,1) +
      &  0.0 * xx_genarr2d_dummy(iarr)
 #endif
       CALL CTRL_MAP_GENARR2D( B_glen, iarr, myThid )
       endif
-      if(iarr .eq. 3) then
+      if(iarr .eq. 2) then
 #ifdef ALLOW_OPENAD
        C_basal_friction(1,1,1,1) = c_basal_friction(1,1,1,1) +
      &  0.0 * xx_genarr2d_dummy(iarr)
@@ -233,7 +233,7 @@ C--   to 3 generic 2D control arrays
 !      CALL CTRL_MAP_GENARR2D( streamice_bdot_depth_maxmelt_v, 
 !     &  iarr, myThid )
 !      endif
-      if(iarr .eq. 1) then
+      if(iarr .eq. 3) then
 #ifdef ALLOW_OPENAD
        streamice_bdot_maxmelt_v(1,1,1,1) = 
      &  streamice_bdot_maxmelt_v(1,1,1,1) +

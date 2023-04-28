@@ -5,7 +5,7 @@
 #
 
 #nprocs=128
-itermax=30
+itermax=35
 procsonnode=128
 
 
@@ -47,13 +47,13 @@ do
  grep 'global fc =' $fich
  echo Cleaning
  \rm tapelev*
- cp adxx* gradcontrol
- cp xx* gradcontrol
+ mv adxx* gradcontrol
+ mv xx* gradcontrol
  if [ `expr $i % 5` -eq 0 ]
  then
   direc=run$name$ii
   mkdir $direc
-  rm pickup.* pickup_*  maskCtrl* hFac* wunit* RA*ta DX*ta DY*ta DR*ta PH*ta
+  rm maskCtrl* hFac* wunit* RA*ta DX*ta DY*ta DR*ta PH*ta
   mv -f *.meta *.data STDOUT* STDERR* out err $direc 
   mv -f $direc/wunit*.*data ./
  fi

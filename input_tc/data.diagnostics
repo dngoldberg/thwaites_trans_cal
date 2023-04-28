@@ -25,6 +25,7 @@
 #                'GM_VisbK',
    filename(1) = 'land_ice',
   frequency(1) = 1296000.,
+  timephase(1) = 0.
 #                'GM_PsiX ','GM_PsiY ',
 #                'GM_Kwx  ','GM_Kwy  ','GM_Kwz  ',
 #                'GM_Kux  ','GM_Kvy  ',

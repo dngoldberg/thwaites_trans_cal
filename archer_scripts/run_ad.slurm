@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --time=10:00:00
+#SBATCH --time=12:00:00
 #SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=100
@@ -14,14 +14,14 @@ module swap cray-mpich  cray-mpich/8.1.4
 module load cray-hdf5-parallel/1.12.0.3
 module load cray-netcdf-hdf5parallel/4.7.4.3
 
-if [ $2 == 'snap' ]; then
-        run_folder="run_ad_$1_$2"
-else
-        run_folder="run_ad_$1_$2_$3_$4$5$6$7"
-fi
+run_folder=$1
 
 cd $SLURM_SUBMIT_DIR/../$run_folder
 
 bash opt_script.csh
+
+cd ../archer_scripts
+source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
+sbatch --job-name=DOWNLOAD -A $HECACC rput_ad_run.slurm $run_folder
 
 exit

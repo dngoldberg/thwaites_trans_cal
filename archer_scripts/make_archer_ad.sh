@@ -26,8 +26,8 @@ PETSCDIR=/work/n02/n02/dngoldbe/petsc/
 export LD_LIBRARY_PATH=/work/n02/n02/dngoldbe/petsc/lib:$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 if [ $1 == "genarr" ]; then
-	numgen=3
-	numtim=0
+	echo "DO NOT USE genarr option"
+	exit
 elif [ $1 == "snap" ]; then 
         numgen=2
         numtim=0

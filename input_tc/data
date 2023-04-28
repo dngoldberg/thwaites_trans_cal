@@ -45,6 +45,7 @@
  monitorFreq=0.,
  dumpInitAndLast=.false.
 # externForcingCycle=18921600.
+# pickupsuff='ckptA'
  &
 # Gridding parameters
  &PARM04
