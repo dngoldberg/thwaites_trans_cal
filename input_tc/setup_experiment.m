@@ -1,4 +1,4 @@
-function setup_experiment(nx,ny,gx,gy);
+function setup_experiment(nx,ny,gx,gy,bmsurf);
 % this function creates a set of input files for use with STREAMICE
 % it is meant to be called by gen_mesh.m
 % nx, ny -- columns and rows of computational grid

@@ -10,7 +10,6 @@ global timesteps_per_year
 load temp_data
 
 
-
 filter_surf = false;
 
 %%% THESE VALUES SHOULD BE CONSISTENT WITH data.streamice
@@ -47,6 +46,7 @@ end
 !mkdir -p velocity_constraints
 !rm velocity_constraints/*
 for i =1:length(YEARS);
+ YEARS(i)
  vxt = vxmoug{i};
  vxt(isnan(v)) = nan;
  vyt(isnan(v)) = nan;
@@ -60,6 +60,7 @@ for i =1:length(YEARS);
  vyt(set_to_nan) = -999999;
  errxt(set_to_nan) = -999999;
  erryt(set_to_nan) = -999999;
+
 
  vxt = [[vxt zeros(ny,gx)];zeros(gy,nx+gx)];
  vyt = [[vyt zeros(ny,gx)];zeros(gy,nx+gx)];
@@ -75,10 +76,10 @@ vx0=vx;
 vy0=vy;
 
 
-vx(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
-vy(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
-verr(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
-verrstd(isnan(v) | isnan(verrstd) | ~mask_cost) = -999999;
+vx(isnan(v) | isnan(verrstd) | ~mask_dom) = -999999;
+vy(isnan(v) | isnan(verrstd) | ~mask_dom) = -999999;
+verr(isnan(v) | isnan(verrstd)| ~mask_dom) = -999999;
+verrstd(isnan(v) | isnan(verrstd)| ~mask_dom) = -999999;
 
 %%% PREPARE SURFACE CONSTRAINTS
 
@@ -103,9 +104,9 @@ for i=1:length(years);
 	surftemp_smith(isnan(surftemp_smith)) = -999999;
 
 	surftemp2 = surftemp;
-	surftemp2(dhT>(-.3*years(i))) = -999999;
+	surftemp2(dhT>(-.25*years(i))) = -999999;
 	surftemp2_smith = surftemp_smith;
-	surftemp2_smith(dhT>(-.3*years(i))) = -999999;
+	surftemp2_smith(dhT>(-.25*years(i))) = -999999;
         surftemp = [[surftemp zeros(ny,gx)];zeros(gy,nx+gx)];
         surftemp_smith = [[surftemp_smith zeros(ny,gx)];zeros(gy,nx+gx)];
         surftemp2_smith = [[surftemp2_smith zeros(ny,gx)];zeros(gy,nx+gx)];
@@ -179,6 +180,16 @@ thick = thick_mod;
 gr = (bed==base);
 mask(thick<0 & mask~=1) = 1;
 
+%%%%%%%%%%%%%%%%%%%%%
+
+thick_floatation_bm = (- density_oce*surfbm) / (density_ice - density_oce);
+thick_floatation_bm(surfbm==0)=0;
+base_floatation_bm = surfbm - thick_floatation_bm;
+basebm = max(bed,base_floatation_bm);
+thick_mod_bm = surfbm-basebm;
+thick_mod_bm(surfbm==0)=0;
+thick_bm = thick_mod_bm;
+maskbm(thick<0 & mask~=1) = 1;
 
 %%%%%%%%%%%%%%%%%%%%%
 
@@ -198,6 +209,8 @@ mask(thick<0 & mask~=1) = 1;
 %    mask(surf<0)=0;
 %    surf(surf<0)=0;
 
+%%%%%%%%%%%%%%%%%%%%%%
+
 hmask = ones(size(thick));
 hmask(mask==1)=-1;
 hmask(surf==0 & mask~=1)=0;
@@ -206,8 +219,6 @@ hmask(:,[1 end]) = -1;
 hmask(thick<10 & (hmask==1 | hmask==2))= -1;
 hmask(surf>2000)=-1;
 hmask(~mask_dom)=-1;
-
-
 
 con_mask = hmask==1;
 CC = bwconncomp(con_mask,4);
@@ -223,6 +234,36 @@ if (length(pp)>1);
   end;
  end;
 end;
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+hmaskbm = ones(size(thick_bm));
+hmaskbm(maskbm==1)=-1;
+hmaskbm(surfbm==0 & maskbm~=1)=0;
+hmaskbm([1 end],:) = -1;
+hmaskbm(:,[1 end]) = -1;
+hmaskbm(thick_bm<10 & (hmaskbm==1 | hmaskbm==2))= -1;
+hmaskbm(surfbm>2000)=-1;
+hmaskbm(~mask_dom)=-1;
+
+con_mask = hmaskbm==1;
+CC = bwconncomp(con_mask,4);
+pp = CC.PixelIdxList;
+length_pp = [];
+
+for i=1:length(pp);
+    length_pp(i) = length(pp{i});
+end
+[xx isort] = sort(length_pp,'descend');
+if (length(pp)>1);
+ for i=2:length(pp);
+  for k=1:length(pp{isort(i)});
+   hmaskbm(pp{isort(i)}(k)) = -1;
+  end;
+ end;
+end;
+
+%%%%%%%%%%%%%%%%%%%%%%
 
 % this field is not used -- but demonstrates how to define the B field for isothermal ice
 
@@ -311,6 +352,8 @@ binwrite('faketopog.bin',faketopog');
 
 thick = [[thick zeros(ny,gx)];zeros(gy,nx+gx)];
 binwrite('BedMachineThick.bin',thick');
+thick_bm = [[thick_bm zeros(ny,gx)];zeros(gy,nx+gx)];
+binwrite('BedMachineThickRema.bin',thick_bm');
 
 vx = [[vx zeros(ny,gx)];zeros(gy,nx+gx)];
 binwrite('velobsSnapu.bin',vx');
@@ -367,6 +410,8 @@ binwrite('delY.bin',[diffy ones(1,gy)]);
 
 hmask = [[hmask -1*ones(ny,gx)];-1*ones(gy,nx+gx)];
 binwrite('hmask.bin',hmask');
+hmaskbm = [[hmaskbm -1*ones(ny,gx)];-1*ones(gy,nx+gx)];
+binwrite('hmask_bm.bin',hmaskbm');
 %hmask_dirich = [[hmask_dirich -1*ones(ny,gx)];-1*ones(gy,nx+gx)];
 %binwrite('hmask_dirich.bin',hmask_dirich');
 

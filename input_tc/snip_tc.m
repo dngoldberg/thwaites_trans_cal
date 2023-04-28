@@ -31,9 +31,12 @@ diffy = diff(y_mesh);
 
 [X Y] = meshgrid(x_mesh_mid,y_mesh_mid);
 
-mask_dom = roipoly(X,Y,X,x,y);
-load bounds2
+load bounds3
+mask_dom = roipoly(X,Y,X,xmask,ymask);
+%mask_dom = roipoly(X,Y,X,x,y);
+load bounds1
 mask_cost = roipoly(X,Y,X,x,y);
+
 
 verr = interpMouginotAnt2017(X,Y,1,1);
 verrstd = interpMouginotAnt2017(X,Y,1,0);
@@ -44,6 +47,7 @@ bmthick = interpBedmachineAntarctica(X,Y,'thickness','linear','/totten_1/ModelDa
 firn = interpBedmachineAntarctica(X,Y,'firn','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 geoid = interpBedmachineAntarctica(X,Y,'geoid','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 maskbm = interpBedmachineAntarctica(X,Y,'mask','nearest','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
+surfbm = interpBedmachineAntarctica(X,Y,'surface','linear','/totten_1/ModelData/Antarctica/BedMachine/BedMachineAntarctica-v3.5.nc');
 smb = interpRACMOant(X,Y);
 %[dh_paolo dh_paolo_fil T_out] = interpPaolo2015(X(:), Y(:), [2004:2011]');
 %dh_paolo_rec = zeros(length(y_mesh_mid),length(x_mesh_mid),size(dh_paolo,3));
@@ -92,7 +96,6 @@ end
 
 load /totten_1/ModelData/Antarctica/Bamber2009DEM/krigged_dem_nsidc.mat
 surf = interp2(x,y,surfacedem,X,Y);
-return
 
 load /totten_1/ModelData/Antarctica/CPOM_dhdt/dH_cpom_interpolants.mat
 dH_T3_cpom = dH_T3(X,Y);
@@ -108,7 +111,7 @@ firn(nofirn) = InvDistWeighting(X(hasfirn),Y(hasfirn),firn(hasfirn),...
 
 
 
-save temp_data.mat bed firn geoid YEARS surf x_mesh_mid y_mesh_mid mask_dom dH_T3_cpom dH_T8_cpom dH_T13_cpom smb diffx diffy verrstd vx vy v maskbm bmthick mask_cost dhdtSmith
+save temp_data.mat bed firn geoid YEARS surf surfbm x_mesh_mid y_mesh_mid mask_dom dH_T3_cpom dH_T8_cpom dH_T13_cpom smb diffx diffy verrstd vx vy v maskbm bmthick mask_cost dhdtSmith
 
 %surf = interpBedmachineAntarctica(X,Y,'surface');
 %thick = interpBedmachineAntarctica(X,Y,'thickness');
