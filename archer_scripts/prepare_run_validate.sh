@@ -79,7 +79,7 @@ if [ x$betatype == x ]; then
         betatype=0
 fi
 if [ x$smithconstr == x ]; then
-        smithconstr=''
+        smithconstr='NS'
 fi
 if [ x$bigconstr == x ]; then
         bigconstr='surf'

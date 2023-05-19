@@ -4,19 +4,36 @@
 ################################################
 
 # ID number for run
-JOBNO=00
 
 # clean run directory and link all required files
 
 # record start times
 TIMEQSTART="$(date +%s)"
-echo Start-time `date` >> ../run_forward/times
+#echo Start-time `date` >> ../run_forward/times
 
-#./prepare_run_ad.sh $1 $2
+if [ $# == 0 ]; then
+	echo "pass a file"
+	exit
+fi
+
+if [ -f "$1" ]; then
+	cat $1
+else
+	echo "pass a file that exists"
+	exit
+fi
+
+#./prepare_run_ad.sh $1 $2 $3 $4 $5 $6 $7
+output=$(bash prepare_rerun_ad.sh $1) 
+
+nm=$(echo $output|cut -d ' ' -f1)
+echo $output
 
 echo $JOBNO
 echo $TIMEQSTART
 echo $HECACC
 # submit the job chain
-sbatch --job-name=ice_$1 -A $HECACC run_ad.slurm 
+cp $1 ../$nm
+RES=$(sbatch --job-name=ice_$1 -A $HECACC run_ad.slurm $nm)
+echo $RES run_ad.slurm $1 $nm >> job_id_list
 #qsub -A $HECACC run.sh

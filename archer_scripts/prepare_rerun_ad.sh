@@ -51,7 +51,7 @@ if [ x$betatype == x ]; then
 	betatype=0
 fi
 if [ x$smithconstr == x ]; then
-	smithconstr='NS'
+	smithconstr=''
 fi
 if [ x$bigconstr == x ]; then
 	bigconstr='surf'
@@ -83,7 +83,7 @@ fi
 
 echo $run_folder
 
-
+exit
 
 # Empty the run directory - but first make sure it exists!
 if [ -d "../$run_folder" ]; then
@@ -190,18 +190,11 @@ else
 	fi
 
 
-	if [ $smithconstr == 'S' ] || [ $smithconstr == 'SC' ]; then
+	if [ $smithconstr == 'S' ]; then
 	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
 	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
 	 mv data.streamice.temp data.streamice
 	fi
-
-	if [ $smithconstr == 'SC' ] || [ $smithconstr == 'NSC' ]; then
-	 strDeepMelt=" streamice_bdot_maxmelt = 200"
-	 sed "s/.*streamice_bdot_maxmelt.*/$strDeepMelt/" data.streamice > data.streamice.temp
-	 mv data.streamice.temp data.streamice
-        fi	 
-
 
 
         ln -s ../archer_scripts/get_beta_bglen.py .
@@ -229,17 +222,17 @@ if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
   tikhbglen="1.e6"
 elif [[ $bigconstr == 'vel' ]]; then
   wgtsurf=0.01
-  wgtvel=0.08
+  wgtvel=0.015
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
-  wgtvel=0.0008
+  wgtvel=0.00015
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 else
   wgtsurf=1.0
-  wgtvel=0.08
+  wgtvel=0.015
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 fi
