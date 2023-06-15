@@ -47,6 +47,7 @@
  streamice_bdot_exp = 1.
  STREAMICEcostMaskFile = ''
  STREAMICE_use_global_ctrl = .false.
+ STREAMICE_shelf_dhdt_ctrl = .false.
  STREAMICEBdotMaxMeltFile = ''
  bdotMaxmeltTimeDepFile = ''
  bglenTimeDepFile=''
