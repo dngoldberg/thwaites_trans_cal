@@ -66,10 +66,12 @@ for i =1:length(YEARS);
  vyt = [[vyt zeros(ny,gx)];zeros(gy,nx+gx)];
  errxt = [[errxt zeros(ny,gx)];zeros(gy,nx+gx)];
  erryt = [[erryt zeros(ny,gx)];zeros(gy,nx+gx)];
+ errt = sqrt(errxt.^2+erryt.^2);
+
 
  binwrite(['velocity_constraints/velobsMoug' appNum(timesteps_per_year*(YEARS(i)-2004),10) 'u.bin'],vxt');
  binwrite(['velocity_constraints/velobsMoug' appNum(timesteps_per_year*(YEARS(i)-2004),10) 'v.bin'],vyt');
- binwrite(['velocity_constraints/velobsMoug' appNum(timesteps_per_year*(YEARS(i)-2004),10) 'err.bin'],sqrt(errxt.^2+erryt.^2));
+ binwrite(['velocity_constraints/velobsMoug' appNum(timesteps_per_year*(YEARS(i)-2004),10) 'err.bin'],errt');
 end
 
 vx0=vx;
@@ -115,14 +117,14 @@ for i=1:length(years);
 	dhT(surftemp==-99999) = -999999;
         errCpom = ones(ny,nx);
         errCpomSmith = errCpom; 
-        errCpomSmith(Ismith) = .5;
+        errCpomSmith(Ismith) = .1;
 	errCpomSmith = [[errCpomSmith zeros(ny,gx)];zeros(gy,nx+gx)];
 
 
 
 
 	binwrite(['surface_constraints/full_CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp');
-        binwrite(['surface_constraints/CPOM_surf' appNum(timesteps_per_year*years(i),10) 'err.bin'],errCpomSmith');
+        binwrite(['surface_constraints/CPOM_surf' appNum(timesteps_per_year*years(i),10) 'err.bin'],errCpom');
 	binwrite(['surface_constraints/full_CPOMSmith_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp_smith');
         binwrite(['surface_constraints/CPOMSmith_surf' appNum(timesteps_per_year*years(i),10) 'err.bin'],errCpomSmith');
 
