@@ -38,6 +38,7 @@ else
 fi
 
 cd $SLURM_SUBMIT_DIR/../${run_folder}
+export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 srun --distribution=block:block --hint=nomultithread ./mitgcmuv > out 2> err
 

@@ -4,7 +4,7 @@
 ################################################
 
 code_dir=code
-input_dir=../input/
+input_dir=../input_tc/
 
 
 while read -r line; do
@@ -100,9 +100,13 @@ ln -s $input_dir/* .
 cp ../archer_scripts/opt_script.csh ./
 if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 stroptiter="itermax=200"
-sed "s/.*itermax=40.*/$stroptiter/" opt_script.csh > temp
-mv temp opt_script.csh
+else
+stroptiter="itermax=40"
 fi
+
+sed "s/.*itermax=.*/$stroptiter/" opt_script.csh > temp
+mv temp opt_script.csh
+
 ln -s ../archer_scripts/add0upto3c .
 ln -s ../archer_scripts/clear_optim.sh .
 
@@ -194,6 +198,9 @@ else
 	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
 	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
 	 mv data.streamice.temp data.streamice
+	 strShelfConstr=" STREAMICE_shelf_dhdt_ctrl = .false.,"
+	 sed "s|.*STREAMICE_shelf_dhdt_ctrl.*|${strShelfConstr}|" data.streamice > data.streamice.temp
+         mv data.streamice.temp data.streamice
 	fi
 
 	if [ $smithconstr == 'SC' ] || [ $smithconstr == 'NSC' ]; then
@@ -224,22 +231,22 @@ fi
 
 if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
   wgtsurf=0.
-  wgtvel=0.
+  wgtvel=1.
   tikhbeta="1.e6"
   tikhbglen="1.e6"
 elif [[ $bigconstr == 'vel' ]]; then
   wgtsurf=0.01
-  wgtvel=0.08
+  wgtvel=0.024
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
-  wgtvel=0.0008
+  wgtvel=0.00024
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 else
   wgtsurf=1.0
-  wgtvel=0.08
+  wgtvel=0.024
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 fi
@@ -301,9 +308,9 @@ ln -s ../$build_dir/mitgcmuv_ad .
 
 
 module load PrgEnv-gnu
-module swap cray-mpich  cray-mpich/8.1.4
-module load cray-hdf5-parallel/1.12.0.3
-module load cray-netcdf-hdf5parallel/4.7.4.3
+#module swap cray-mpich  cray-mpich/8.1.4
+#module load cray-hdf5-parallel/1.12.0.3
+#module load cray-netcdf-hdf5parallel/4.7.4.3
 
 
 optimdir=OPTIM

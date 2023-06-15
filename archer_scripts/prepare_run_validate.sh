@@ -3,8 +3,7 @@
 # Clean out old results and link input files.
 ################################################
 
-code_dir=code
-input_dir=../input/
+input_dir=../input_tc/
 
 
 #Sliding: coul

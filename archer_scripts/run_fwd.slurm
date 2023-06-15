@@ -32,6 +32,7 @@ module load cray-hdf5-parallel/1.12.0.3
 module load cray-netcdf-hdf5parallel/4.7.4.3
 
 cd $SLURM_SUBMIT_DIR/../run_fwd_$1_$2
+export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 srun --distribution=block:block --hint=nomultithread ./mitgcmuv > out 2> err
 

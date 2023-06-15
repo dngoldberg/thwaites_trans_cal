@@ -10,9 +10,11 @@
 
 
 module load PrgEnv-gnu
-module swap cray-mpich  cray-mpich/8.1.4
-module load cray-hdf5-parallel/1.12.0.3
-module load cray-netcdf-hdf5parallel/4.7.4.3
+#module swap cray-mpich  cray-mpich/8.1.4
+module load cray-hdf5-parallel
+module load cray-netcdf-hdf5parallel
+
+export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 run_folder=$1
 
