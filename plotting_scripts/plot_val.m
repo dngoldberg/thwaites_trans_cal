@@ -1,4 +1,4 @@
-function [metric_vel metric_dhdt] = plot_val(sm,do_plot)
+function [metric_vel metric_dhdt] = plot_val(do_plot)
 
 rlow=rdmds(['R_low_siinit'])';
 folder = pwd();
@@ -90,40 +90,44 @@ end
 
 
 h3 = figure;
-sm=false
-%for i = 1:length(nitersurf);
-    if (sm)
-    disp(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/CPOMSmith_surf' appNum(n,10) '.bin'])
-    sobs = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/CPOMSmith_surf' appNum(n,10) '.bin'],8,260,300)';
-    else
-    disp(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/full_CPOM_surf' appNum(n,10) '.bin'])
-    n=96;
-    sobs96 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/full_CPOM_surf' appNum(n,10) '.bin'],8,260,300)';
-    n=156;
-    sobs156 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/full_CPOM_surf' appNum(n,10) '.bin'],8,260,300)';
-    end
+%sm=false
 
-    sobs156(sobs156==-999999)=nan;
-    sobs96(sobs96==-999999)=nan;
-    sobs156=sobs156(J,I);
-    sobs96=sobs96(J,I);
+%if (sm)
+% filenamebase = 'CPOMSmith_surf';
+%else
+filenamebase = 'CPOM_surf';
+%end
 
-    [q x m]=rdmds(['land_ice'],[96 156]);
+sobs96 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/' filenamebase appNum(96,10) '.bin'],8,260,300)';
+sobs156 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/surface_constraints/' filenamebase appNum(156,10) '.bin'],8,260,300)';
+sobs156(sobs156==-999999)=nan;
+sobs96(sobs96==-999999)=nan;
+sobs156=sobs156(J,I);
+sobs96=sobs96(J,I);
 
-    hmask=q(I,J,4,1)';
+dhdt_obs = (sobs156-sobs96)/5;
+dhdt_obs(dhdt_obs>.25) = nan;
 
-    h=q(I,J,3,2)';
-    haf = h;
-    haf(rlow<0)=haf(rlow<0)+1027/917*rlow(rlow<0);
-    fl = (haf>0);
-    haf(haf<0)=0;
+[q x m]=rdmds(['land_ice'],[96 156]);
+hmask=q(I,J,4,1)';
 
-    ds=q(I,J,3,2)'-q(I,J,3,1)';
-    ds(hmask~=1)=nan;
-%    s(haf<5)=nan;
+h=q(I,J,3,2)';
+haf = h;
+haf(rlow<0)=haf(rlow<0)+1027/917*rlow(rlow<0);
+fl = (haf>0);
+haf(haf<0)=0;
+
+dhdt=(q(I,J,3,2)'-q(I,J,3,1)')/5;
+dhdt(haf<5)=nan;
+dhdt(hmask~=1)=nan;
+
+mis = dhdt - dhdt_obs;
+
+metric_dhdt = sum(mis(~isnan(mis)));
+
     figure(h3)
 
-
+if (do_plot)
     subplot(1,2,1);
     pcolor(x_mesh_mid,y_mesh_mid,(sobs156-sobs96)/5); shading flat; colorbar; caxis([-10 10]); colormap redblue; axis equal; axis tight
     hold on
@@ -132,14 +136,15 @@ sm=false
     hold off
     h=colorbar; ylabel(h,'meters')
     subplot(1,2,2);
-    pcolor(x_mesh_mid,y_mesh_mid,(ds/5)); shading flat; colorbar; caxis([-10 10]); colormap redblue; axis equal; axis tight
-    hold on
-    contour(x_mesh_mid,y_mesh_mid,hmask==1,[.5 .5],'k','linewidth',2);
-    contour(x_mesh_mid,y_mesh_mid,fl,[.5 .5],'color',[.6 0 0],'linewidth',2);
-    hold off
+    pcolor(x_mesh_mid,y_mesh_mid,(dhdt)); shading flat; colorbar; caxis([-10 10]); colormap redblue; axis equal; axis tight
+    %hold on
+    %contour(x_mesh_mid,y_mesh_mid,hmask==1,[.5 .5],'k','linewidth',2);
+    %contour(x_mesh_mid,y_mesh_mid,fl,[.5 .5],'color',[.6 0 0],'linewidth',2);
+    %hold off
     h=colorbar; ylabel(h,'meters')
-%set(gcf,'position',[100 500 800 50]);
-%    print('-dpng',['surf_mis_' num2str(iter) '.png'])
-%    close(h3)
+end
+
+return
+
 
 
