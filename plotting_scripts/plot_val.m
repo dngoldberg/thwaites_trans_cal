@@ -23,7 +23,7 @@ I = 1:xrange;
 J = 1:yrange;
 rlow = rlow(J,I);
 
-if (length(nitervel)>0);
+if (length(nitervel)>0 & do_plot);
 	h1 = figure;
 	h2 = figure;
 end
