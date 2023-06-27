@@ -15,6 +15,15 @@ nitervel=[108 120 132 144 156];% 162 180 198 216 234];
 %nitervel=[];% 162 180 198 216 234];
 nitersurf=[156];% 234];
 
+strgrep = evalc('!grep niter0 STDOUT.0000');
+niter0 = str2num(strgrep(end-2:end-1));
+if (isempty(niter0))
+ niter0 = str2num(strgrep(end-1));
+end
+
+strgrep = evalc('!grep streamicethickFile STDOUT.0000');
+strRema = findstr(strgrep,'Rema');
+isRema = ~isempty(strRema);
 
 load /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/temp_data
 xrange = length(x_mesh_mid);
@@ -28,19 +37,25 @@ if (length(nitervel)>0 & do_plot);
 	h2 = figure;
 end
 
-for i = 1:length(nitervel-1);
-    n1 = nitervel(i)
-    n2 = nitervel(i+1)
+for i = 1:length(nitervel)-1;
+    
+    if (~isRema)
+     n1 = nitervel(i)
+     n2 = nitervel(i+1)
+    else
+     n1 = nitervel(i)-96
+     n2 = nitervel(i+1)-96
+    end
     
     vobs1 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/velocity_constraints/velobsMoug' appNum(n1,10) 'v.bin'],8,260,300)';
     uobs1 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/velocity_constraints/velobsMoug' appNum(n1,10) 'u.bin'],8,260,300)';
     uobs1(uobs1==-999999 | uobs1==0)=nan;
-    cobs1 = sqrt(uobs1.^2+vobs1.^2);
+    cobs1 = sqrt(uobs1(J,I).^2+vobs1(J,I).^2);
 
     vobs2 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/velocity_constraints/velobsMoug' appNum(n2,10) 'v.bin'],8,260,300)';
     uobs2 = binread(['/home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/velocity_constraints/velobsMoug' appNum(n2,10) 'u.bin'],8,260,300)';
     uobs2(uobs2==-999999 | uobs2==0)=nan;
-    cobs2 = sqrt(uobs2.^2+vobs2.^2);
+    cobs2 = sqrt(uobs2(J,I).^2+vobs2(J,I).^2);
 
     dc_obs = cobs2-cobs1;
 
@@ -54,6 +69,8 @@ for i = 1:length(nitervel-1);
     c1(q(I,J,4,1)'~=1)=nan;
     c2(q(I,J,4,2)'~=1)=nan;
     dc = c2 - c1;
+    size(dc)
+    size(dc_obs)
 
     mis = dc-dc_obs;
 
@@ -76,7 +93,6 @@ for i = 1:length(nitervel-1);
     haf(haf<0)=0;
     contour(x_mesh_mid,y_mesh_mid,hmask==1,[.5 .5],'k','linewidth',2);
     title(num2str(2004 + nitervel(i)/12))
-%    contour(x_mesh_mid,y_mesh_mid,fl,[.5 .5],'color',[.6 0 0],'linewidth',2);
     hold off
     colormap redblue; freezeColors; freezeColors(colorbar);
     end
@@ -88,8 +104,9 @@ print('-dpng',['../validation_plots/' folder '.png'])
 end
 
 
-
+if (do_plot)
 h3 = figure;
+end
 %sm=false
 
 %if (sm)
@@ -108,26 +125,37 @@ sobs96=sobs96(J,I);
 dhdt_obs = (sobs156-sobs96)/5;
 dhdt_obs(dhdt_obs>.25) = nan;
 
-[q x m]=rdmds(['land_ice'],[96 156]);
-hmask=q(I,J,4,1)';
+if (isRema)
+	s96 = rdmds('H_streamiceinit')';
+	q = rdmds('land_ice',60);
+elseif (niter0==96);
+	s96 = rdmds('H_streamiceinit')';
+	q = rdmds('land_ice',156);
+elseif (niter0 == 0);
+	s96 = rdmds('land_ice',96,'rec',3)';
+        q = rdmds('land_ice',156);
+else
+	error ('found corner case');
+end
 
-h=q(I,J,3,2)';
+hmask=q(I,J,4)';
+h = q(I,J)';
 haf = h;
 haf(rlow<0)=haf(rlow<0)+1027/917*rlow(rlow<0);
 fl = (haf>0);
 haf(haf<0)=0;
 
-dhdt=(q(I,J,3,2)'-q(I,J,3,1)')/5;
+dhdt=(h-s96(J,I))/5;
 dhdt(haf<5)=nan;
 dhdt(hmask~=1)=nan;
 
 mis = dhdt - dhdt_obs;
 
-metric_dhdt = sum(mis(~isnan(mis)));
+metric_dhdt = abs(sum(mis(~isnan(mis))));
 
-    figure(h3)
 
 if (do_plot)
+    figure(h3)
     subplot(1,2,1);
     pcolor(x_mesh_mid,y_mesh_mid,(sobs156-sobs96)/5); shading flat; colorbar; caxis([-10 10]); colormap redblue; axis equal; axis tight
     hold on
