@@ -69,7 +69,7 @@ if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 	cd $OLDPWD
 else
         run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
-	ad_folder="../run_ad_${sliding}_snap"
+	ad_folder="run_ad_${sliding}_snap"
 	if [ $gentim == 'genarr' ]; then
 		build_dir=build_genarr
 	        cd $input_dir; 
@@ -198,7 +198,7 @@ else
 	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
 	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
 	 mv data.streamice.temp data.streamice
-	 strShelfConstr=" STREAMICE_shelf_dhdt_ctrl = .false.,"
+	 strShelfConstr=" STREAMICE_shelf_dhdt_ctrl = .true.,"
 	 sed "s|.*STREAMICE_shelf_dhdt_ctrl.*|${strShelfConstr}|" data.streamice > data.streamice.temp
          mv data.streamice.temp data.streamice
 	fi

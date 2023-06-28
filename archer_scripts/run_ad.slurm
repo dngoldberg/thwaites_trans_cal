@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --time=12:00:00
+#SBATCH --time=23:45:00
 #SBATCH --exclusive
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=100

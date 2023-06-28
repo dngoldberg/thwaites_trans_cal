@@ -12,10 +12,13 @@ if (slid == 'Weert'):
 else:
     slidstr='coul'
 
-beta0=rdmds(ad_folder+ '/runoptiter' + numiter + '/C_basal_fric')
-betap=rdmds(ad_folder+ '/gradcontrol/xx_beta',int(numiter))
-B0=rdmds(ad_folder+ '/runoptiter' + numiter + '/B_glen_sqrt')
-Bp=rdmds(ad_folder+ '/gradcontrol/xx_bglen',int(numiter))
+print(run_folder)
+
+
+beta0=rdmds('../' + ad_folder+ '/runoptiter' + numiter + '/C_basal_fric')
+betap=rdmds('../' + ad_folder+ '/gradcontrol/xx_beta',int(numiter))
+B0=rdmds('../' + ad_folder+ '/runoptiter' + numiter + '/B_glen_sqrt')
+Bp=rdmds('../' + ad_folder+ '/gradcontrol/xx_bglen',int(numiter))
 
 beta=beta0+betap
 B=B0+Bp

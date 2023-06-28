@@ -6,3 +6,5 @@ BetaType: 0
 Smith: NS
 BigConstr: surf
 gentim: gentim
+proj: last
+longproj: -1

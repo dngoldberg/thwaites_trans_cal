@@ -8,15 +8,19 @@ invIter = int(sys.argv[1])
 direc=(sys.argv[2])
 run_direc=(sys.argv[3])
 project_mode=(sys.argv[4]) # mode is max, min, or last (min for beta/B, max for melt)
+melt_mode_str=(sys.argv[5])
+bglen_mode=(sys.argv[6])
+beta_mode=(sys.argv[7])
 
+print(run_direc)
 
 #run_ad_coul_tc_gentim_g00
 
 #direc='../run_ad_' + sliding_law + '_tc_' + foldname + '_' + melt_mode_str + bglen_mode + beta_mode
 #run_direc = '../run_val_' + sliding_law + '_' + melt_mode_str + bglen_mode + beta_mode + '_' + project_mode + pad
-melt_control=rdmds(direc + '/gradcontrol/xx_bdot_max',invIter)
-bglen_control=rdmds(direc + '/gradcontrol/xx_bglen',invIter)
-beta_control=rdmds(direc + '/gradcontrol/xx_beta',invIter)
+melt_control=rdmds('../' + direc + '/gradcontrol/xx_bdot_max',invIter)
+bglen_control=rdmds('../' + direc + '/gradcontrol/xx_bglen',invIter)
+beta_control=rdmds('../' + direc + '/gradcontrol/xx_beta',invIter)
 
 if (melt_mode_str=='G'):
     if (project_mode=='max'):
@@ -58,10 +62,10 @@ bglen_ax=1
 beta_ax=1
 
 
-bglen0 = np.tile(rdmds(direc + '/runoptiter000/B_glen_sqrt'),(bglen_ax,1,1))
-beta0 = np.tile(rdmds(direc + '/runoptiter000/C_basal_fric'),(beta_ax,1,1))
+bglen0 = np.tile(rdmds('../' + direc + '/runoptiter040/B_glen_sqrt'),(bglen_ax,1,1))
+beta0 = np.tile(rdmds('../' + direc + '/runoptiter040/C_basal_fric'),(beta_ax,1,1))
 
-melt_control_new.byteswap().tofile(run_direc + '/xx_bdot_max.bin')
-(beta0+beta_control_new).byteswap().tofile(run_direc + '/xx_beta.bin')
-(bglen0+bglen_control_new).byteswap().tofile(run_direc + '/xx_bglen.bin')
+melt_control_new.byteswap().tofile('../' + run_direc + '/xx_bdot_max.bin')
+(beta0+beta_control_new).byteswap().tofile('../' + run_direc + '/xx_beta.bin')
+(bglen0+bglen_control_new).byteswap().tofile('../' + run_direc + '/xx_bglen.bin')
 

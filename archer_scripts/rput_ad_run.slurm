@@ -32,7 +32,8 @@ if [ $HOMEHOST != 'null' ] ; then
   ssh -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR"
 #  scp -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos $i.tgz $HOMEHOST:$HOMEDIR
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files ${run_folder}.tgz $HOMEHOST:$HOMEDIR
-  ssh -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t "cd $HOMEDIR; tar -xzvf \"$run_folder}\".tgz"
+  ssh -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; tar -xzvf \"${run_folder}\".tgz"
+  ssh -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; rm \"${run_folder}\".tgz"
 
 #  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL *crash* $HOMEHOST:$HOMEDIR
 

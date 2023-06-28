@@ -54,8 +54,8 @@ while read -r line; do
    if [[ $line == gentim:* ]]; then
       gentim=$(echo "$line" | cut -c 9-);
    fi;
-   if [[ $line == project:* ]]; then
-      proj=$(echo "$line" | cut -c 10-);
+   if [[ $line == proj:* ]]; then
+      proj=$(echo "$line" | cut -c 7-);
    fi;
    if [[ $line == longproj:* ]]; then
       longproj=$(echo "$line" | cut -c 11-);
@@ -90,7 +90,7 @@ if [ x$proj == x ]; then
         proj='last'
 fi
 if [ x$longproj == x ]; then
-        longproj=0
+        longproj=50
 fi
 
 if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
@@ -102,7 +102,7 @@ if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
 	run_folder="run_val_${sliding}_${tdep}_${longproj}"
         run_ad_folder="run_ad_${sliding}_$tdep"	
 else
-        run_folder="run_val_${sliding}_${melttype}${glentype}${betatype}${smithconstr}_${proj}_${gentim}_${longproj}"
+        run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}"
         run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
 fi
 
@@ -122,7 +122,7 @@ ln -s $input_dir/* .
 
 if [ $tdep == "tc" ]; then
  cd ../archer_scripts;
- python prepare_validation_controls_const.py 30 $run_ad_folder $run_folder $proj
+ python prepare_validation_controls_const.py 40 $run_ad_folder $run_folder $proj $melttype $glentype $betatype
  cd $OLDPWD
 fi
 
@@ -157,22 +157,34 @@ if [ $gentim == 'gentimlong' ]; then
 fi
 
 timestep=2592000
-if [ $2 != "snap" ] && [ $2 != "snapBM" ]; then
+if [ $tdep != "snap" ] && [ $tdep != "snapBM" ]; then
  if [ $type == 'long' ]; then
+  if [ $longproj == -1 ]; then
+   ntimesteps=156
+   strniter=" niter0=0"
+  else
    ntimesteps=600
    strniter=" niter0=156"
+  fi
  else
+  strniter=" niter0=96"
   if [ $longproj == 0 ]; then
    ntimesteps=60
-  else
+  elif [ $longproj == 50 ]; then
    ntimesteps=660
+  elif [ $longproj == -1 ]; then
+   ntimesteps=96
+   strniter=" niter0=0"
   fi
-  strniter=" niter0=96"
  fi
- strpickup=" pickupsuff='ckptA'"
- cp ../$run_ad_folder/runoptiter030/pickup*ckptA* ./
+ if [ $longproj == -1 ]; then
+  strpickup="# pickupsuff='ckptA'"
+ else
+  strpickup=" pickupsuff='ckptA'"
+ fi
+ cp ../$run_ad_folder/runoptiter040/pickup*ckptA* ./
 else
- if [ $2 != "snapBM" ]; then
+ if [ $tdep == "snapBM" ]; then
   if [ $longproj == 0 ]; then
    ntimesteps=60
   else
@@ -258,6 +270,21 @@ else
  strBeta=" STREAMICEbasaltracFile = 'xx_beta.bin',"
  sed "s/.*STREAMICEbasaltracFile.*/$strBeta/" data.streamice > data.streamice.temp
  mv data.streamice.temp data.streamice
+
+	if [ $smithconstr == 'S' ] || [ $smithconstr == 'SC' ]; then
+	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
+	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
+	 mv data.streamice.temp data.streamice
+	 strShelfConstr=" STREAMICE_shelf_dhdt_ctrl = .true.,"
+	 sed "s|.*STREAMICE_shelf_dhdt_ctrl.*|${strShelfConstr}|" data.streamice > data.streamice.temp
+         mv data.streamice.temp data.streamice
+	fi
+
+	if [ $smithconstr == 'SC' ] || [ $smithconstr == 'NSC' ]; then
+	 strDeepMelt=" streamice_bdot_maxmelt = 200"
+	 sed "s/.*streamice_bdot_maxmelt.*/$strDeepMelt/" data.streamice > data.streamice.temp
+	 mv data.streamice.temp data.streamice
+        fi	 
 fi 
 
 
@@ -304,10 +331,34 @@ strVelLev=" streamice_vel_cost_timesteps = 108 120 132 144 156"
 strThinLev=" streamice_surf_cost_timesteps = 156"
 #strVelLev=" streamice_vel_cost_timesteps = 60 72 84 96 108 120 132 144 156"
 #strThinLev=" streamice_surf_cost_timesteps = 36 96"
-sed "s/.*streamice_vel_cost_timesteps.*/$strVelLev/" data.streamice > data.streamice.temp
+if [ $longproj == 50 ] || [ $longproj == 0 ]; then
+ sed "s/.*streamice_vel_cost_timesteps.*/$strVelLev/" data.streamice > data.streamice.temp
+ mv data.streamice.temp data.streamice
+ sed "s/.*streamice_surf_cost_timesteps.*/$strThinLev/" data.streamice > data.streamice.temp
+ mv data.streamice.temp data.streamice
+fi
+
+
+strconstrvel=" streamice_wgt_vel = 0.024"
+strconstrsurf=" streamice_wgt_surf = 1.0"
+if [ $longproj == -1 ] && [ $tdep == 'tc' ]; then
+ if [[ $bigconstr == 'vel' ]]; then
+  strconstrvel=" streamice_wgt_vel = 0.024"
+  strconstrsurf=" streamice_wgt_surf = .01"
+ elif [[ $bigconstr == 'surf' ]]; then
+  strconstrvel=" streamice_wgt_vel = 0.00024"
+  strconstrsurf=" streamice_wgt_surf = 1.0"
+ elif [[ $bigconstr == 'mix' ]]; then
+  strconstrvel=" streamice_wgt_vel = 0.024"
+  strconstrsurf=" streamice_wgt_surf = 1.0"
+ fi
+fi
+
+sed "s/.*streamice_wgt_vel =.*/$strconstrvel/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
-sed "s/.*streamice_surf_cost_timesteps.*/$strThinLev/" data.streamice > data.streamice.temp
+sed "s/.*streamice_wgt_surf.*/$strconstrsurf/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
+
 
 ln -s ../$build_dir/mitgcmuv .
 
