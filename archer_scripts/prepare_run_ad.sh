@@ -172,11 +172,17 @@ else
 	  strglob=" STREAMICE_use_global_ctrl = .true."
 	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
 	  mv data.streamice.temp data.streamice
+	  strglob="  xx_gentim2d_glosum(1) = .true."
+	  sed "s/.*xx_gentim2d_glosum.*/$strglob/" data.ctrl > data.ctrl.temp;
+	  mv data.ctrl.temp data.ctrl
 	 elif [ $melttype == g ]; then
 	  gentimperiod1=0
 	  strglob=" STREAMICE_use_global_ctrl = .true."
 	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
 	  mv data.streamice.temp data.streamice
+	  strglob="  xx_gentim2d_glosum(1) = .true."
+	  sed "s/.*xx_gentim2d_glosum.*/$strglob/" data.ctrl > data.ctrl.temp;
+	  mv data.ctrl.temp data.ctrl
 	 fi
          gentimperiod2=$(($glentype*$timestep*$ntimesteps/2))
          gentimperiod3=$(($betatype*$timestep*$ntimesteps/2))
