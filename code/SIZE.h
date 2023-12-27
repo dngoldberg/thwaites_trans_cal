@@ -64,6 +64,6 @@ C                routine buffers.
       PARAMETER ( MAX_OLX = OLx,
      &            MAX_OLY = OLy )
 
-      INTEGER     nobcs
-      PARAMETER ( nobcs = 4 )
+C      INTEGER     nobcs
+C      PARAMETER ( nobcs = 4 )
 
