@@ -23,7 +23,11 @@ cd $SLURM_SUBMIT_DIR/../$run_folder
 bash opt_script.csh
 
 cd ../archer_scripts
+module load cray-python
+source /work/n02/n02/dngoldbe/myenv/bin/activate
+export PYTHONPATH="${PYTHONPATH}:/work/n02/n02/dngoldbe/MITgcm/utils/python/MITgcmutils/MITgcmutils/"
 source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
 sbatch --job-name=DOWNLOAD -A $HECACC rput_ad_run.slurm $run_folder
+bash submit_val.sh ../$run_folder/exp*txt
 
 exit

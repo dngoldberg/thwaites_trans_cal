@@ -308,7 +308,7 @@ sed "s/.*snapshot_cost.*/$strsnap/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
 if [ $longproj == 50 ]; then
- strDiagnostics="  frequency(1) = 15552000.,"
+ strDiagnostics="  frequency(1) = 7776000.,"
  strTimephase="  timephase(1) = 0."
 else
  strDiagnostics="  frequency(1) = 2592000.,"
@@ -329,7 +329,7 @@ cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
 
 strVelLev=" streamice_vel_cost_timesteps = 108 120 132 144 156"
 strThinLev=" streamice_surf_cost_timesteps = 156"
-#strVelLev=" streamice_vel_cost_timesteps = 60 72 84 96 108 120 132 144 156"
+#strVelLev=" streamice_vel_cost_timesteps = 12 24 36 48 60 72 84 96 108 120 132 144 156"
 #strThinLev=" streamice_surf_cost_timesteps = 36 96"
 if [ $longproj == 50 ] || [ $longproj == 0 ]; then
  sed "s/.*streamice_vel_cost_timesteps.*/$strVelLev/" data.streamice > data.streamice.temp

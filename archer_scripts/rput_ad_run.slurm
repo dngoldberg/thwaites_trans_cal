@@ -34,6 +34,12 @@ if [ $HOMEHOST != 'null' ] ; then
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files ${run_folder}.tgz $HOMEHOST:$HOMEDIR
   ssh -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; tar -xzvf \"${run_folder}\".tgz"
   ssh -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; rm \"${run_folder}\".tgz"
+  cd $run_folder
+  rm -r OPTIM
+  mv runoptiter040 temprunoptiter040
+  rm -r runoptiter*
+  mv temprunoptiter040 runoptiter040
+  rm runoptiter040/STD*
 
 #  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL *crash* $HOMEHOST:$HOMEDIR
 

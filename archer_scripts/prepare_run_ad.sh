@@ -242,17 +242,17 @@ if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
   tikhbglen="1.e6"
 elif [[ $bigconstr == 'vel' ]]; then
   wgtsurf=0.01
-  wgtvel=0.024
+  wgtvel=0.006
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
-  wgtvel=0.00024
+  wgtvel=0.00006
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 else
   wgtsurf=1.0
-  wgtvel=0.024
+  wgtvel=0.006
   tikhbeta="5.e5"
   tikhbglen="5.e5"
 fi

@@ -5,7 +5,7 @@
 #
 
 #nprocs=128
-itermax=200
+itermax=0
 procsonnode=128
 
 

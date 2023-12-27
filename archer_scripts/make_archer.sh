@@ -38,7 +38,7 @@ fi
 
 
 cd $ROOTDIR
-git checkout branch_controls_snap_tc
+git checkout master
 cd $OLDPWD
 
 
