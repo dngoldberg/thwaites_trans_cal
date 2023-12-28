@@ -14,6 +14,7 @@ input_dir=../input_tc/
 #Smith: NS
 #BigConstr: surf
 #gentim: gentim
+#meltconst: n
 
 #1 sliding lar
 #2 melt mode
@@ -60,6 +61,9 @@ while read -r line; do
    if [[ $line == longproj:* ]]; then
       longproj=$(echo "$line" | cut -c 11-);
    fi;
+   if [[ $line == meltconst:* ]]; then
+      longproj=$(echo "$line" | cut -c 12-);
+   fi;
 done < $1
 
 if [ x$sliding == x ]; then
@@ -92,6 +96,12 @@ fi
 if [ x$longproj == x ]; then
         longproj=50
 fi
+if [ x$meltconst == x ]; then
+        meltconst='n'
+else
+        meltapp='_${meltconst}'
+fi
+
 
 if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
 	echo "badrun"
@@ -99,10 +109,10 @@ if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
 fi
 
 if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
-	run_folder="run_val_${sliding}_${tdep}_${longproj}"
+	run_folder="run_val_${sliding}_${tdep}_${longproj}_${meltconst}${meltapp}"
         run_ad_folder="run_ad_${sliding}_$tdep"	
 else
-        run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}"
+        run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}"
         run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
 fi
 
@@ -122,7 +132,7 @@ ln -s $input_dir/* .
 
 if [ $tdep == "tc" ]; then
  cd ../archer_scripts;
- python prepare_validation_controls_const.py 40 $run_ad_folder $run_folder $proj $melttype $glentype $betatype
+ python prepare_validation_controls_const.py 40 $run_ad_folder $run_folder $proj $melttype $glentype $betatype $meltconst
  cd $OLDPWD
 fi
 

@@ -11,6 +11,12 @@ project_mode=(sys.argv[4]) # mode is max, min, or last (min for beta/B, max for 
 melt_mode_str=(sys.argv[5])
 bglen_mode=(sys.argv[6])
 beta_mode=(sys.argv[7])
+mconst=(sys.argv[8])
+
+if (mconst=='n'):
+    mconst=0
+else:
+    mconst=str(mconst)
 
 print(run_direc)
 
@@ -57,6 +63,10 @@ if (int(beta_mode)==1):
         raise Exception("invalid beta project mode")
 else:
     beta_control_new = beta_control
+
+if (mconst != 0):
+    melt_control[:] = mconst
+
 
 bglen_ax=1
 beta_ax=1
