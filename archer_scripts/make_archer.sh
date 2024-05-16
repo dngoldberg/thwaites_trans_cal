@@ -50,7 +50,7 @@ $ROOTDIR/tools/genmake2 -mods="../$code_dir" -of=$HOME/own_scripts/dev_linux_amd
 #$ROOTDIR/tools/genmake2 -mods='../code' -mpi
 echo $LD_LIBRARY_PATH
 make depend
-make
+make -j
 
 # Switch Programming Environment back
 #module swap PrgEnv-intel PrgEnv-cray

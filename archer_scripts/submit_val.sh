@@ -28,6 +28,7 @@ output=$(bash prepare_run_validate.sh $1)
 
 nm=$(echo $output|cut -d ' ' -f1)
 echo $output
+echo $nm
 
 echo $JOBNO
 echo $TIMEQSTART
@@ -36,4 +37,3 @@ echo $HECACC
 cp $1 ../$nm
 RES=$(sbatch --job-name=ice_$1 -A $HECACC run_val.slurm $nm)
 echo $RES run_val.slurm $1 $nm >> job_id_list
-#qsub -A $HECACC run.sh

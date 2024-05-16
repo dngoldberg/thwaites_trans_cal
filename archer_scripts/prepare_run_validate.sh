@@ -62,7 +62,7 @@ while read -r line; do
       longproj=$(echo "$line" | cut -c 11-);
    fi;
    if [[ $line == meltconst:* ]]; then
-      longproj=$(echo "$line" | cut -c 12-);
+      meltconst=$(echo "$line" | cut -c 12-);
    fi;
 done < $1
 
@@ -97,9 +97,9 @@ if [ x$longproj == x ]; then
         longproj=50
 fi
 if [ x$meltconst == x ]; then
-        meltconst='n'
+        meltconst="n"
 else
-        meltapp='_${meltconst}'
+        meltapp="_${meltconst}"
 fi
 
 
@@ -109,7 +109,7 @@ if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
 fi
 
 if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
-	run_folder="run_val_${sliding}_${tdep}_${longproj}_${meltconst}${meltapp}"
+	run_folder="run_val_${sliding}_${tdep}_${longproj}${meltapp}"
         run_ad_folder="run_ad_${sliding}_$tdep"	
 else
         run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}"
@@ -136,7 +136,6 @@ if [ $tdep == "tc" ]; then
  cd $OLDPWD
 fi
 
-
 # Deep copy of the master namelist (so it doesn't get overwritten in input/)
 rm -f data
 cp -f $input_dir/data .
@@ -147,6 +146,14 @@ cp -f $input_dir/data.streamice ./
 rm -f data.diagnostics
 cp -f $input_dir/data.diagnostics ./
 
+if [ $tdep == "snap" ]; then
+ if [ meltconst != "n" ]; then
+  meltnum=$(( 50 + $meltconst ))
+  strmelt=" streamice_bdot_maxmelt = $meltnum"
+  sed "s/.*streamice_bdot_maxmelt .*/$strmelt/" data.streamice > data.streamice.temp
+  mv data.streamice.temp data.streamice
+ fi
+fi
 
 if [ $sliding == 'weert' ]; then
  strcoul=" streamice_allow_reg_coulomb=.false."
@@ -185,6 +192,8 @@ if [ $tdep != "snap" ] && [ $tdep != "snapBM" ]; then
   elif [ $longproj == -1 ]; then
    ntimesteps=96
    strniter=" niter0=0"
+  else
+   ntimesteps=$(( 12 * $longproj + 5 * 12 ))
   fi
  fi
  if [ $longproj == -1 ]; then
@@ -198,7 +207,7 @@ else
   if [ $longproj == 0 ]; then
    ntimesteps=60
   else
-   ntimesteps=660
+   ntimesteps=$(( 12 * $longproj + 5 * 12 ))
   fi
   strniter=" niter0=0"
   strpickup=" pickupsuff=''"
@@ -206,7 +215,7 @@ else
   if [ $longproj == 0 ]; then
    ntimesteps=156
   else
-   ntimesteps=756
+   ntimesteps=$(( 12 * $longproj + 13 * 12 ));
   fi
   strniter=" niter0=0"
   strpickup=" pickupsuff=''"
@@ -317,11 +326,11 @@ mv data.streamice.temp data.streamice
 sed "s/.*snapshot_cost.*/$strsnap/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
-if [ $longproj == 50 ]; then
- strDiagnostics="  frequency(1) = 7776000.,"
+if [ $longproj == 0 ]; then
+ strDiagnostics="  frequency(1) = 2592000.,"
  strTimephase="  timephase(1) = 0."
 else
- strDiagnostics="  frequency(1) = 2592000.,"
+ strDiagnostics="  frequency(1) = 7776000.,"
  strTimephase="  timephase(1) = 0."
 fi
 sed "s/.*frequency(1).*/$strDiagnostics/" data.diagnostics > data.streamice.temp
