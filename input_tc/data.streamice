@@ -88,7 +88,7 @@
  STREAMICEBglenCostMaskFile = 'BglenPattynMask.bin'
  STREAMICE_do_timedep_cost = .false.
  STREAMICE_do_snapshot_cost = .true.
- streamice_vel_cost_timesteps = 60 72 84 96 108 120 132 144 156
+ streamice_vel_cost_timesteps = 12 24 36 48 60 72 84 96 108 120 132 144 156
  streamice_surf_cost_timesteps = 36 96 156
  &
 
