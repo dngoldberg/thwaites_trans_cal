@@ -14,17 +14,17 @@
 #sed "s/.*Timedep.*/Timedep: snapBM/" ../params/exp2.txt > exp_snapBM.txt;
 #bash submit_ad.sh exp_snapBM.txt
 
-sed "s/.*BigConstr.*/BigConstr: surf/" ../params/exp1.txt > exp_surf_constr.txt
-bash submit_ad.sh exp_surf_constr.txt
+sed "s/.*BigConstr.*/BigConstr: dhdt/" ../params/exp1.txt > exp_dhdt_constr.txt
+bash submit_ad.sh exp_dhdt_constr.txt
 
 sed "s/.*BigConstr.*/BigConstr: vel/" ../params/exp1.txt > exp_vel_constr.txt;
-bash submit_ad.sh exp_vel_constr.txt
+bash submit_val.sh exp_vel_constr.txt
 
 sed "s/.*BigConstr.*/BigConstr: mix/" ../params/exp1.txt > exp_mix_constr.txt;
-bash submit_ad.sh exp_mix_constr.txt
+bash submit_val.sh exp_mix_constr.txt
 
-sed "s/.*Smith.*/Smith: NSC/" exp_mix_constr.txt > exp_mix_constr_bigmelt.txt
-bash submit_ad.sh exp_mix_constr_bigmelt.txt
+#sed "s/.*Timedep.*/Timedep: snap/" exp_mix_constr.txt > exp_snap.txt
+#bash submit_val.sh exp_snap.txt
 
 
 #sed "s/.*MeltType.*/MeltType: G/" exp_mix_constr.txt > exp_mix_constr_meltvar.txt

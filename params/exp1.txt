@@ -3,8 +3,8 @@ Timedep: tc
 MeltType: g
 GlenType: 0
 BetaType: 0
-Smith: NS
+Smith: S
 BigConstr: surf
 gentim: gentim
 proj: last
-longproj: -1
+longproj: 50

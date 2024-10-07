@@ -109,10 +109,10 @@ if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
 fi
 
 if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
-	run_folder="run_val_${sliding}_${tdep}_${longproj}${meltapp}"
+	run_folder="run_val_${sliding}_${tdep}_${longproj}${meltapp}_${meltconst}"
         run_ad_folder="run_ad_${sliding}_$tdep"	
 else
-        run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}"
+        run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
         run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
 fi
 

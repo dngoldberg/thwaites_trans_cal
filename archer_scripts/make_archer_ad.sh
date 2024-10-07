@@ -14,6 +14,7 @@
 
 
 module load PrgEnv-gnu
+module load cray-hdf5-parallel
 PETSCDIR=/work/n02/n02/dngoldbe/petsc/
 export LD_LIBRARY_PATH=/work/n02/n02/dngoldbe/petsc/lib:$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
@@ -51,7 +52,7 @@ fi
 
 
 cd $ROOTDIR
-git checkout master
+#git checkout branch_plot_misfit
 cd $OLDPWD
 
 sing_str="-B $PWD:$HOME /work/n02/n02/dngoldbe/oad_sing/openad.sif"

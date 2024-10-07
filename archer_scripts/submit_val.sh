@@ -35,5 +35,5 @@ echo $TIMEQSTART
 echo $HECACC
 # submit the job chain
 cp $1 ../$nm
-RES=$(sbatch --job-name=ice_$1 -A $HECACC run_val.slurm $nm)
+RES=$(sbatch --job-name=ice_$1 -A n02-GRISLAKES run_val.slurm $nm)
 echo $RES run_val.slurm $1 $nm >> job_id_list

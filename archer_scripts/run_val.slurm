@@ -15,8 +15,13 @@ module load cray-hdf5-parallel
 module load cray-netcdf-hdf5parallel
 
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
+source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
+
 
 run_folder=$1
+start_time=$(date +%s)
+MSGEMAIL=$(echo "Job starting val: $1")
+sbatch --job-name=EML -A $HECACC /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
 
 cd $SLURM_SUBMIT_DIR/../$run_folder
 
@@ -25,5 +30,10 @@ srun --distribution=block:block --hint=nomultithread ./mitgcmuv
 cd ../archer_scripts
 source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
 sbatch --job-name=DOWNLOAD -A $HECACC rput_val_run.slurm $run_folder
+
+end_time=$(date +%s)
+totaltime=$(((end_time-start_time)/60))
+MSGEMAIL=$(echo "Job ending val: $1, total time: $totaltime minutes")
+sbatch --job-name=EML -A $HECACC /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
 
 exit

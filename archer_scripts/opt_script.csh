@@ -23,12 +23,15 @@ i=`expr $ite + 1`
 echo "HERE2"
 echo $itermax
 
+source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
+
 mkdir gradcontrol
 
 while [ $i -le $itermax ]
 do
- echo "GOT HERE"
+ echo "GOT HERE 1"
  ii=`./add0upto3c $i`
+ echo "GOT HERE 2"
  echo "Beginning of iteration $ii"
  cp OPTIM/ecco_ctrl_MIT_CE_000.opt0$ii .
  ite=`expr $i - 1`
@@ -65,6 +68,18 @@ do
  cp -f ../data.optim .
  ./optim.x > std$ii
  cd ..
+
+ if [ $((i % 4)) -eq 0 ]; then
+     now=$(date +"%T")
+     costthin=$(grep "surface contr" $fich)
+     costdhdt=$(grep "dhdt contr" $fich)
+     costglen=$(grep "bglen smooth" $fich)
+     costprio=$(grep "prior smooth" $fich) 
+     costvel=$(grep "td vel misfit" $fich)
+     MSGEMAIL=$(echo "ice model cost, current time: $now, current iter: $i, thin cost: $costthin, dhdt cost: $costdhdt, smooth cost: $costglen, prior cost: $costprio, vel cost: $costvel")
+     sbatch --job-name=EML -A $HECACC /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
+ fi
+
  echo $i
  i=`expr $i + 1`
  echo "GOT HERE END"
@@ -80,7 +95,7 @@ exit
 for i in $(ls -d runoptiter*00); do 
  mv $i SAVE$i;
 done
-rm OPTIM/OPWARM*
+#rm OPTIM/OPWARM*
 
 
 

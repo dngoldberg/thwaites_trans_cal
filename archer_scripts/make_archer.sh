@@ -38,7 +38,7 @@ fi
 
 
 cd $ROOTDIR
-git checkout master
+#git checkout master
 cd $OLDPWD
 
 

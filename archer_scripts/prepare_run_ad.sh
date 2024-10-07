@@ -33,7 +33,19 @@ while read -r line; do
    if [[ $line == gentim:* ]]; then
       gentim=$(echo "$line" | cut -c 9-);
    fi;
+   if [[ $line == tikhbeta:* ]]; then
+      tikhbeta=$(echo "$line" | cut -c 11-);
+      imposetikh=1
+   fi;
+   if [[ $line == tikhbglen:* ]]; then
+      tikhbglen=$(echo "$line" | cut -c 12-);
+      imposetikh=1
+   fi;
+   if [[ $line == restart:* ]]; then
+      reStart=$(echo "$line" | cut -c 10-);
+   fi;
 done < $1
+
 
 if [ x$sliding == x ]; then
 	sliding='coul'
@@ -59,6 +71,15 @@ fi
 if [ x$gentim == x ]; then
 	gentim='gentim'
 fi
+if [ x$reStart == x ]; then
+        reStart='false' 
+fi
+if [ x$tikhbeta == x ]; then
+        tikhbeta='0.1e5'
+fi
+if [ x$tikhbglen == x ]; then
+        tikhbglen='0.1e5'
+fi
 
 
 
@@ -68,7 +89,11 @@ if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 	cd $input_dir; 
 	cd $OLDPWD
 else
-        run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+	if [ imposetikh == 1 ]; then
+         run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
+        else
+	 run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+	fi
 	ad_folder="run_ad_${sliding}_snap"
 	if [ $gentim == 'genarr' ]; then
 		build_dir=build_genarr
@@ -82,7 +107,9 @@ else
 fi
 
 echo $run_folder
-
+if [ $reStart == 'true' ]; then
+	exit
+fi
 
 
 # Empty the run directory - but first make sure it exists!
@@ -95,7 +122,8 @@ else
 fi
 
 
-
+cp $input_dir/*bin ./
+cp -r $input_dir/*constraints ./
 ln -s $input_dir/* .
 cp ../archer_scripts/opt_script.csh ./
 if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
@@ -137,6 +165,7 @@ else
  ntimesteps=96
 fi
 
+
 if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 	strdt=" deltaT=$timestep,"
 	strtimestep=' nTimesteps=1,'
@@ -172,7 +201,7 @@ else
 	  strglob=" STREAMICE_use_global_ctrl = .true."
 	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
 	  mv data.streamice.temp data.streamice
-	  strglob="  xx_gentim2d_glosum(1) = .true."
+          strglob="  xx_gentim2d_glosum(1) = .true."
 	  sed "s/.*xx_gentim2d_glosum.*/$strglob/" data.ctrl > data.ctrl.temp;
 	  mv data.ctrl.temp data.ctrl
 	 elif [ $melttype == g ]; then
@@ -203,6 +232,9 @@ else
 	if [ $smithconstr == 'S' ] || [ $smithconstr == 'SC' ]; then
 	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
 	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
+	 mv data.streamice.temp data.streamice
+	 strShelfConstr=" STREAMICEdhdtOptimTCBasename = 'dhdt_constraints/CPOMSmith_dhdt',"
+	 sed "s|.*dhdtOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
 	 mv data.streamice.temp data.streamice
 	 strShelfConstr=" STREAMICE_shelf_dhdt_ctrl = .true.,"
 	 sed "s|.*STREAMICE_shelf_dhdt_ctrl.*|${strShelfConstr}|" data.streamice > data.streamice.temp
@@ -238,23 +270,29 @@ fi
 if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
   wgtsurf=0.
   wgtvel=1.
-  tikhbeta="1.e6"
-  tikhbglen="1.e6"
+#  tikhbeta="1.e6"
+#  tikhbglen="1.e6"
 elif [[ $bigconstr == 'vel' ]]; then
   wgtsurf=0.01
   wgtvel=0.006
-  tikhbeta="5.e5"
-  tikhbglen="5.e5"
+  tikhbeta=".1e5"
+  tikhbglen=".1e5"
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
   wgtvel=0.00006
-  tikhbeta="5.e5"
-  tikhbglen="5.e5"
+  tikhbeta="0.1e5"
+  tikhbglen="0.1e5"
+elif [[ $bigconstr == 'dhdt' ]]; then
+  wgtsurf=0.0
+  wgtvel=0.00006
+  wgtdhdt=1.0
+  tikhbeta=".1e5"
+  tikhbglen=".1e5"
 else
   wgtsurf=1.0
   wgtvel=0.006
-  tikhbeta="5.e5"
-  tikhbglen="5.e5"
+  tikhbeta=".1e5"
+  tikhbglen=".1e5"
 fi
 
 
@@ -280,11 +318,14 @@ mv data.streamice.temp data.streamice
 
 strconstrvel=" streamice_wgt_vel = $wgtvel"
 strconstrsurf=" streamice_wgt_surf = $wgtsurf"
+strconstrdhdt=" streamice_wgt_dhdt = $wgtdhdt"
 strtikhbeta="  streamice_wgt_tikh_beta = ${tikhbeta}"
 strtikhbglen=" streamice_wgt_tikh_bglen = ${tikhbglen}"
 sed "s/.*streamice_wgt_vel =.*/$strconstrvel/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 sed "s/.*streamice_wgt_surf.*/$strconstrsurf/" data.streamice > data.streamice.temp
+mv data.streamice.temp data.streamice
+sed "s/.*streamice_wgt_dhdt.*/$strconstrdhdt/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 sed "s/.*streamice_wgt_tikh_bglen.*/$strtikhbglen/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
