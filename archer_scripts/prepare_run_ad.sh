@@ -33,6 +33,7 @@ while read -r line; do
    if [[ $line == gentim:* ]]; then
       gentim=$(echo "$line" | cut -c 9-);
    fi;
+   imposetikh=0
    if [[ $line == tikhbeta:* ]]; then
       tikhbeta=$(echo "$line" | cut -c 11-);
       imposetikh=1
@@ -41,6 +42,7 @@ while read -r line; do
       tikhbglen=$(echo "$line" | cut -c 12-);
       imposetikh=1
    fi;
+   imposedepth=0
    if [[ $line == bdotdepth:* ]]; then
       bdotdepth=$(echo "$line" | cut -c 12-);
       imposedepth=1
@@ -96,10 +98,10 @@ if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 	cd $input_dir; 
 	cd $OLDPWD
 else
-	if [ imposetikh == 1 ]; then
+	if [ $imposetikh == 1 ]; then
          run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
         else
-	 if [ imposedepth == 1 ]; then
+	 if [ $imposedepth == 1 ]; then
 	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
          else
 	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
@@ -119,7 +121,6 @@ fi
 
 
 echo $run_folder
-return
 if [ $reStart == 'true' ]; then
 	exit
 fi
@@ -166,6 +167,9 @@ else
  strsmooth=" streamice_smooth_gl_width = 0."
 fi
 
+strdepth=" streamice_bdot_depth_nomelt = $bdotdepth"
+sed "s/.*streamice_bdot_depth_nomelt.*/$strdepth/" data.streamice > data.streamice.temp
+mv data.streamice.temp data.streamice
 sed "s/.*reg_coulomb.*/$strcoul/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 sed "s/.*smooth_gl_width.*/$strsmooth/" data.streamice > data.streamice.temp
@@ -287,12 +291,12 @@ if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
 #  tikhbglen="1.e6"
 elif [[ $bigconstr == 'vel' ]]; then
   wgtsurf=0.01
-  wgtvel=0.006
+  wgtvel=0.01
   tikhbeta=".1e5"
   tikhbglen=".1e5"
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
-  wgtvel=0.00006
+  wgtvel=0.0001
   tikhbeta="0.1e5"
   tikhbglen="0.1e5"
 elif [[ $bigconstr == 'dhdt' ]]; then
@@ -303,7 +307,7 @@ elif [[ $bigconstr == 'dhdt' ]]; then
   tikhbglen=".1e5"
 else
   wgtsurf=1.0
-  wgtvel=0.006
+  wgtvel=0.01
   tikhbeta=".1e5"
   tikhbglen=".1e5"
 fi

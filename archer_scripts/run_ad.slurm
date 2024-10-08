@@ -39,7 +39,7 @@ source /work/n02/n02/dngoldbe/myenv/bin/activate
 export PYTHONPATH="${PYTHONPATH}:/work/n02/n02/dngoldbe/MITgcm/utils/python/MITgcmutils/MITgcmutils/"
 source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
 sbatch --job-name=DOWNLOAD -A $HECACC rput_ad_run.slurm $run_folder
-#bash submit_val.sh ../$run_folder/exp*txt
+bash submit_val.sh ../$run_folder/exp*txt
 
 end_time=$(date +%s)
 totaltime=$(((end_time-start_time)/60))

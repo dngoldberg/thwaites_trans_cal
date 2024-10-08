@@ -64,6 +64,10 @@ while read -r line; do
    if [[ $line == meltconst:* ]]; then
       meltconst=$(echo "$line" | cut -c 12-);
    fi;
+   if [[ $line == bdotdepth:* ]]; then
+      bdotdepth=$(echo "$line" | cut -c 12-);
+      imposedepth=1
+   fi;
 done < $1
 
 if [ x$sliding == x ]; then
@@ -101,6 +105,9 @@ if [ x$meltconst == x ]; then
 else
         meltapp="_${meltconst}"
 fi
+if [ x$bdotdepth == x ]; then
+        bdotdepth=0
+fi
 
 
 if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
@@ -112,8 +119,13 @@ if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
 	run_folder="run_val_${sliding}_${tdep}_${longproj}${meltapp}_${meltconst}"
         run_ad_folder="run_ad_${sliding}_$tdep"	
 else
-        run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
-        run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+	if [ $imposedepth == 1 ]; then
+          run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
+          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${bdotdepth}"
+         else
+          run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
+         fi
 fi
 
 build_dir=build_validate
@@ -163,6 +175,9 @@ else
  strsmooth=" streamice_smooth_gl_width = 0."
 fi
 
+strdepth=" streamice_bdot_depth_nomelt = $bdotdepth"
+sed "s/.*streamice_bdot_depth_nomelt.*/$strdepth/" data.streamice > data.streamice.temp
+mv data.streamice.temp data.streamice
 sed "s/.*reg_coulomb.*/$strcoul/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 sed "s/.*smooth_gl_width.*/$strsmooth/" data.streamice > data.streamice.temp
