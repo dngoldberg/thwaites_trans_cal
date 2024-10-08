@@ -41,6 +41,10 @@ while read -r line; do
       tikhbglen=$(echo "$line" | cut -c 12-);
       imposetikh=1
    fi;
+   if [[ $line == bdotdepth:* ]]; then
+      bdotdepth=$(echo "$line" | cut -c 12-);
+      imposedepth=1
+   fi;
    if [[ $line == restart:* ]]; then
       reStart=$(echo "$line" | cut -c 10-);
    fi;
@@ -80,6 +84,9 @@ fi
 if [ x$tikhbglen == x ]; then
         tikhbglen='0.1e5'
 fi
+if [ x$bdotdepth == x ]; then
+        bdotdepth=0
+fi
 
 
 
@@ -92,7 +99,11 @@ else
 	if [ imposetikh == 1 ]; then
          run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
         else
-	 run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+	 if [ imposedepth == 1 ]; then
+	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
+         else
+	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+	 fi
 	fi
 	ad_folder="run_ad_${sliding}_snap"
 	if [ $gentim == 'genarr' ]; then
@@ -106,7 +117,9 @@ else
 	fi
 fi
 
+
 echo $run_folder
+return
 if [ $reStart == 'true' ]; then
 	exit
 fi

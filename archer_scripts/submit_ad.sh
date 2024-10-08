@@ -29,6 +29,8 @@ fi
 #./prepare_run_ad.sh $1 $2 $3 $4 $5 $6 $7
 output=$(bash prepare_run_ad.sh $1) 
 
+return
+
 nm=$(echo $output|cut -d ' ' -f1)
 echo $output
 
