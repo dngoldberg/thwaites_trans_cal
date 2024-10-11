@@ -77,23 +77,19 @@
  &STREAMICE_COST
  streamice_wgt_vel = 0.003
  streamice_wgt_vel_norm = 0.0
- streamice_wgt_tikh_bglen = .1e5
- streamice_wgt_tikh_beta = .1e5
+ streamice_wgt_tikh_bglen = 5.e5
+ streamice_wgt_tikh_beta = 5.e5
  streamice_wgt_tikh_gen = 2.5e4
- streamice_wgt_surf = 0.0
- streamice_wgt_dhdt = 1.0
+ streamice_wgt_surf = 1.0
  streamice_wgt_prior_bglen = .0001
  STREAMICEvelOptimTCBasename = 'velocity_constraints/velobsMoug'
  STREAMICEvelOptimSnapBasename = 'velobsSnap'
  STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOM_surf'
- STREAMICEdhdtOptimTCBasename = 'dhdt_constraints/CPOM_dhdt'
  STREAMICEBglenCostMaskFile = 'BglenPattynMask.bin'
  STREAMICE_do_timedep_cost = .false.
  STREAMICE_do_snapshot_cost = .true.
  streamice_vel_cost_timesteps = 12 24 36 48 60 72 84 96 108 120 132 144 156
  streamice_surf_cost_timesteps = 36 96 156
- streamice_dhdt_cost_timesteps_s = 1 36 96
- streamice_dhdt_cost_timesteps_e = 36 96 156
  &
 
  &STREAMICE_PARM03
