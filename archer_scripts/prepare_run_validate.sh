@@ -64,6 +64,7 @@ while read -r line; do
    if [[ $line == meltconst:* ]]; then
       meltconst=$(echo "$line" | cut -c 12-);
    fi;
+   imposedepth=0
    if [[ $line == bdotdepth:* ]]; then
       bdotdepth=$(echo "$line" | cut -c 12-);
       imposedepth=1
@@ -129,6 +130,7 @@ else
 fi
 
 build_dir=build_validate
+echo $run_folder
 
 # Empty the run directory - but first make sure it exists!
 if [ -d "../$run_folder" ]; then

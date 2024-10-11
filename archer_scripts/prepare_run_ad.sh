@@ -296,7 +296,7 @@ elif [[ $bigconstr == 'vel' ]]; then
   tikhbglen=".1e5"
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
-  wgtvel=0.0001
+  wgtvel=0.0000
   tikhbeta="0.1e5"
   tikhbglen="0.1e5"
 elif [[ $bigconstr == 'dhdt' ]]; then

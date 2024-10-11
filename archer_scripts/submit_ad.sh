@@ -23,7 +23,11 @@ else
 	exit
 fi
 
-
+if [ -f "$2" ]; then
+	val=0
+else
+	val=1
+fi
 
 
 #./prepare_run_ad.sh $1 $2 $3 $4 $5 $6 $7
@@ -38,6 +42,6 @@ echo $TIMEQSTART
 echo $HECACC
 # submit the job chain
 cp $1 ../$nm
-RES=$(sbatch --job-name=ice_$1 -A n02-GRISLAKES run_ad.slurm $nm)
+RES=$(sbatch --job-name=ice_$1 -A n02-GRISLAKES run_ad.slurm $nm $val)
 echo $RES run_ad.slurm $1 $nm >> job_id_list
 #qsub -A $HECACC run.sh
