@@ -91,37 +91,40 @@ verrstd(isnan(v) | isnan(verrstd)| ~mask_dom) = -999999;
 years=[3 8 13];
 Ismith = ~isnan(dhdtSmith);
 for i=1:length(years);
-	yr = num2str(years(i));
-	str = ['dhT = dH_T' num2str(years(i)) '_cpom;'];
-	eval(str)
-	str = ['surftemp = surf + dH_T' num2str(years(i)) '_cpom;'];
-	eval(str)
-	surftemp(~mask_cost) = nan;
-	surftemp(Y<-561e3 | X>-1350e3) = nan;
+        yr = num2str(years(i));
+        str = ['dhT = dH_T' num2str(years(i)) '_cpom;'];
+        eval(str)
+        str = ['surftemp = surfadj + dH_T' num2str(years(i)) '_cpom;'];
+        eval(str)
+        surftemp(~mask_cost) = nan;
+        surftemp(Y<-561e3) = nan;
 
-	surftemp(isnan(surftemp)) = -999999;
+        surftemp(isnan(surftemp)) = -999999;
         surftemp_smith = surftemp;
-	surftemp_smith(Ismith) = ...
-		surf(Ismith) + years(i)*dhdtSmith(Ismith)*(1-density_ice/density_oce);
-	surftemp_smith(isnan(surftemp_smith)) = -999999;
+        surftemp_smith(Ismith) = ...
+                surfadj(Ismith) + years(i)*dhdtSmith(Ismith)*(1-density_ice/density_oce);
+        surftemp_smith(~isnan(dhdtSmith) & gr) = nan;
+        surftemp_smith(isnan(surftemp_smith)) = -999999;
 
-	surftemp2 = surftemp;
-	surftemp2(dhT>(-.25*years(i))) = -999999;
-	surftemp2_smith = surftemp_smith;
-	surftemp2_smith(dhT>(-.25*years(i))) = -999999;
+        surftemp2 = surftemp;
+        surftemp2(dhT>(-0*years(i))) = -999999;
+        surftemp2_smith = surftemp_smith;
+        surftemp2_smith(dhT>(-0*years(i))) = -999999;
+
         surftemp = [[surftemp zeros(ny,gx)];zeros(gy,nx+gx)];
         surftemp_smith = [[surftemp_smith zeros(ny,gx)];zeros(gy,nx+gx)];
         surftemp2_smith = [[surftemp2_smith zeros(ny,gx)];zeros(gy,nx+gx)];
         surftemp2 = [[surftemp2 zeros(ny,gx)];zeros(gy,nx+gx)];
         dhT = [[dhT zeros(ny,gx)];zeros(gy,nx+gx)];
-	dhT(surftemp==-99999) = -999999;
-        errCpom = ones(ny,nx);
-        errCpomSmith = errCpom; 
-        errCpomSmith(Ismith) = .1;
-	errCpomSmith = [[errCpomSmith zeros(ny,gx)];zeros(gy,nx+gx)];
+        dhT(surftemp==-99999) = -999999;
 
-
-
+	errCpom = ones(ny,nx);
+        errCpom(dhT(1:ny,1:nx)>(-.25*years(i))) = 3;
+        errCpomSmith = errCpom;
+        errCpomSmith(Ismith) = .3;
+%       errCpomSmith(base>-500 & Ismith) = 10;
+        errCpomSmith = [[errCpomSmith zeros(ny,gx)];zeros(gy,nx+gx)];
+        errCpom = [[errCpom zeros(ny,gx)];zeros(gy,nx+gx)];
 
 	binwrite(['surface_constraints/full_CPOM_surf'  appNum(timesteps_per_year*years(i),10) '.bin'],surftemp');
         binwrite(['surface_constraints/CPOM_surf' appNum(timesteps_per_year*years(i),10) 'err.bin'],errCpom');

@@ -6,7 +6,7 @@ function plot_results(iter,sm)
 
 nitervel=[60 72 84 96];% 162 180 198 216 234];
 %nitervel=[];% 162 180 198 216 234];
-nitersurf=[36 96];% 234];
+nitersurf=[156];% 234];
 
 
 load /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/input_tc/temp_data
@@ -96,10 +96,10 @@ for i = 1:length(nitersurf);
     subplot(ceil(length(nitersurf)/2),2,i);
 
     s_mis = s-sobs;
-    s_mis(~isnan(sobs) & serr<1) = s_mis(~isnan(sobs) & serr<1);
+    s_mis(~isnan(sobs) & serr<1) = 10*s_mis(~isnan(sobs) & serr<1);
 
     size(s)
-    pcolor(x_mesh_mid,y_mesh_mid,s_mis); shading flat; colorbar; caxis([-80 80]); colormap default; axis equal; axis tight
+    pcolor(x_mesh_mid,y_mesh_mid,s_mis); shading flat; colorbar; caxis([-100 100]); colormap default; axis equal; axis tight
     hold on
     contour(x_mesh_mid,y_mesh_mid,hmask==1,[.5 .5],'k','linewidth',2);
     contour(x_mesh_mid,y_mesh_mid,fl,[.5 .5],'color',[.6 0 0],'linewidth',2);

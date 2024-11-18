@@ -48,7 +48,11 @@ if (~read_issm)
 	if (strcmp(parts{end},'truncmelt'));
         ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7} '_truncmelt'];
 	else
+	if (length(parts)>10);
+        ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7} '_' parts{11}];
+	else
         ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7}];
+	end
 	end
         if (strcmp(parts{5},'gentimlong'));
             folder_start = 156;
@@ -435,6 +439,8 @@ for i = 3:3:Nsteps;
     T(round(i/3)) = i/12;
     if (~isRema | i>96);
         i
+
+        disp(['ad_folder: ' ad_folder]);
         if (i<=folder_start);
 	      h = zeros(length(y_mesh_mid),length(x_mesh_mid));
           

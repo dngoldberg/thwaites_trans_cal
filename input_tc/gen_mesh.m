@@ -5,7 +5,7 @@ npx = 10; % number of x-processors to use (nPx in SIZE.h)
 npy = 10;  % number of y-processors to use (nPy in SIZE.h)
 
 timesteps_per_year = 12;
-snip_tc
+%snip_tc
 
 load temp_data.mat
 
