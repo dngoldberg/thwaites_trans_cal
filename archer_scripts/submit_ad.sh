@@ -30,8 +30,8 @@ else
 fi
 
 
-#./prepare_run_ad.sh $1 $2 $3 $4 $5 $6 $7
 output=$(bash prepare_run_ad.sh $1) 
+echo "GOT HERE"
 echo $output
 
 nm=$(echo $output|cut -d ' ' -f1)
@@ -44,4 +44,3 @@ echo $HECACC
 cp $1 ../$nm
 RES=$(sbatch --job-name=ice_$1 -A n02-GRISLAKES run_ad.slurm $nm $val)
 echo $RES run_ad.slurm $1 $nm >> job_id_list
-#qsub -A $HECACC run.sh
