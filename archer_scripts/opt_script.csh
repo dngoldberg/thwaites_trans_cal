@@ -76,8 +76,6 @@ do
      costglen=$(grep "bglen smooth" $fich)
      costprio=$(grep "prior smooth" $fich) 
      costvel=$(grep "td vel misfit" $fich)
-     MSGEMAIL=$(echo "ice model cost, current time: $now, current iter: $i, thin cost: $costthin, dhdt cost: $costdhdt, smooth cost: $costglen, prior cost: $costprio, vel cost: $costvel")
-     sbatch --job-name=EML -A $HECACC /work/n02/n02/dngoldbe/mitgcm/scripts/email_serial.slurm "${MSGEMAIL}" $SLURM_JOB_ID
  fi
 
  echo $i
