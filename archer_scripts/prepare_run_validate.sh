@@ -78,6 +78,11 @@ while read -r line; do
       bdotdepth=$(echo "$line" | cut -c 12-);
       imposedepth=1
    fi;
+   imposewgtvel=0
+   if [[ $line == wgtvel:* ]]; then
+      wgtvel=$(echo "$line" | cut -c 9-);
+      imposewgtvel=1
+   fi;
 done < $1
 
 if [ x$sliding == x ]; then
@@ -124,6 +129,9 @@ fi
 if [ x$bdotdepth == x ]; then
         bdotdepth=0
 fi
+if [ x$wgtvel == x ]; then
+        wgtvel=0.000
+fi
 
 
 if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
@@ -143,18 +151,36 @@ else
         #  run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
         #fi
 
+#	if [ $imposetikh == 1 ]; then
+#         run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
+#	 run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${tikhbeta}"
+#        else
+#	 if [ $imposedepth == 1 ]; then
+#	  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
+#          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${bdotdepth}"
+#         else
+#	  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+#          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
+#	 fi
+#	fi
+
 	if [ $imposetikh == 1 ]; then
          run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
 	 run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${tikhbeta}"
         else
-	 if [ $imposedepth == 1 ]; then
-	  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
+         if [ $imposedepth == 1 ]; then
+          run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
           run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${bdotdepth}"
          else
-	  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
-          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
-	 fi
-	fi
+          if [ $imposewgtvel == 1 ]; then
+           run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${wgtvel}"
+           run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${wgtvel}"
+          else
+           run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+           run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
+          fi
+         fi
+        fi
 fi
 
 build_dir=build_validate

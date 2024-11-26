@@ -47,6 +47,11 @@ while read -r line; do
       bdotdepth=$(echo "$line" | cut -c 12-);
       imposedepth=1
    fi;
+   imposewgtvel=0
+   if [[ $line == wgtvel:* ]]; then
+      wgtvel=$(echo "$line" | cut -c 9-);
+      imposewgtvel=1
+   fi;
    if [[ $line == restart:* ]]; then
       reStart=$(echo "$line" | cut -c 10-);
    fi;
@@ -81,13 +86,16 @@ if [ x$reStart == x ]; then
         reStart='false' 
 fi
 if [ x$tikhbeta == x ]; then
-        tikhbeta='0.1e5'
+        tikhbeta='0.15e5'
 fi
 if [ x$tikhbglen == x ]; then
-        tikhbglen='0.1e5'
+        tikhbglen='0.15e5'
 fi
 if [ x$bdotdepth == x ]; then
         bdotdepth=0
+fi
+if [ x$wgtvel == x ]; then
+        wgtvel=0.000
 fi
 
 
@@ -104,7 +112,11 @@ else
 	 if [ $imposedepth == 1 ]; then
 	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
          else
-	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+          if [ $imposewgtvel == 1 ]; then
+           run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${wgtvel}"
+	  else
+	   run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
+	  fi
 	 fi
 	fi
 	ad_folder="run_ad_${sliding}_snap"
@@ -287,29 +299,16 @@ fi
 if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
   wgtsurf=0.
   wgtvel=1.
-#  tikhbeta="1.e6"
-#  tikhbglen="1.e6"
 elif [[ $bigconstr == 'vel' ]]; then
-  wgtsurf=0.01
-  wgtvel=0.01
-  tikhbeta=".1e5"
-  tikhbglen=".1e5"
+  wgtsurf=0.00
+  wgtvel=0.0035
 elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
-  wgtvel=0.0000
-  tikhbeta="0.1e5"
-  tikhbglen="0.1e5"
 elif [[ $bigconstr == 'dhdt' ]]; then
   wgtsurf=0.0
-  wgtvel=0.00006
-  wgtdhdt=1.0
-  tikhbeta=".1e5"
-  tikhbglen=".1e5"
 else
   wgtsurf=1.0
-  wgtvel=0.01
-  tikhbeta=".1e5"
-  tikhbglen=".1e5"
+  wgtvel=0.0035
 fi
 
 
