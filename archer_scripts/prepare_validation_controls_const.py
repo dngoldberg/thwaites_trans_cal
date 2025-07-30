@@ -73,8 +73,8 @@ bglen_ax=1
 beta_ax=1
 
 
-bglen0 = np.tile(rdmds('../' + direc + '/runoptiter040/B_glen_sqrt'),(bglen_ax,1,1))
-beta0 = np.tile(rdmds('../' + direc + '/runoptiter040/C_basal_fric'),(beta_ax,1,1))
+bglen0 = np.tile(rdmds('../' + direc + '/runoptiter' + str(invIter).zfill(3) + '/B_glen_sqrt'),(bglen_ax,1,1))
+beta0 = np.tile(rdmds('../' + direc + '/runoptiter' + str(invIter).zfill(3) + '/C_basal_fric'),(beta_ax,1,1))
 
 melt_control_new.byteswap().tofile('../' + run_direc + '/xx_bdot_max.bin')
 (beta0+beta_control_new).byteswap().tofile('../' + run_direc + '/xx_beta.bin')

@@ -6,131 +6,14 @@
 code_dir=code
 input_dir=../input_tc/
 
+source ./parse_params.sh $1
 
-while read -r line; do
-   # Look for the correct line (if you have other parameters)
-   if [[ $line == Sliding:* ]]; then
-      sliding=$(echo "$line" | cut -c 10-);
-   fi;
-   if [[ $line == Timedep:* ]]; then
-      tdep=$(echo "$line" | cut -c 10-);
-   fi;
-   if [[ $line == MeltType:* ]]; then
-      melttype=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == GlenType:* ]]; then
-      glentype=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == BetaType:* ]]; then
-      betatype=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == Smith:* ]]; then
-      smithconstr=$(echo "$line" | cut -c 8-);
-   fi;
-   if [[ $line == BigConstr:* ]]; then
-      bigconstr=$(echo "$line" | cut -c 12-);
-   fi;
-   if [[ $line == gentim:* ]]; then
-      gentim=$(echo "$line" | cut -c 9-);
-   fi;
-   imposetikh=0
-   if [[ $line == tikhbeta:* ]]; then
-      tikhbeta=$(echo "$line" | cut -c 11-);
-      imposetikh=1
-   fi;
-   if [[ $line == tikhbglen:* ]]; then
-      tikhbglen=$(echo "$line" | cut -c 12-);
-      imposetikh=1
-   fi;
-   imposedepth=0
-   if [[ $line == bdotdepth:* ]]; then
-      bdotdepth=$(echo "$line" | cut -c 12-);
-      imposedepth=1
-   fi;
-   imposewgtvel=0
-   if [[ $line == wgtvel:* ]]; then
-      wgtvel=$(echo "$line" | cut -c 9-);
-      imposewgtvel=1
-   fi;
-   if [[ $line == restart:* ]]; then
-      reStart=$(echo "$line" | cut -c 10-);
-   fi;
-done < $1
+output_param_file="params_file.txt_$(date +"%F%T.%6N")"
+source ./write_params.sh
+source ./get_run_folders.sh
 
-
-if [ x$sliding == x ]; then
-	sliding='coul'
-fi
-if [ x$tdep == x ]; then
-	tdep='tc'
-fi
-if [ x$melttype == x ]; then
-	melttype=g
-fi
-if [ x$glentype == x ]; then
-	glentype=0
-fi
-if [ x$betatype == x ]; then
-	betatype=0
-fi
-if [ x$smithconstr == x ]; then
-	smithconstr='NS'
-fi
-if [ x$bigconstr == x ]; then
-	bigconstr='surf'
-fi
-if [ x$gentim == x ]; then
-	gentim='gentim'
-fi
-if [ x$reStart == x ]; then
-        reStart='false' 
-fi
-if [ x$tikhbeta == x ]; then
-        tikhbeta='0.15e5'
-fi
-if [ x$tikhbglen == x ]; then
-        tikhbglen='0.15e5'
-fi
-if [ x$bdotdepth == x ]; then
-        bdotdepth=0
-fi
-if [ x$wgtvel == x ]; then
-        wgtvel=0.000
-fi
-
-
-
-if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
-	build_dir=build_snap
-        run_folder="run_ad_${sliding}_$tdep"
-	cd $input_dir; 
-	cd $OLDPWD
-else
-	if [ $imposetikh == 1 ]; then
-         run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
-        else
-	 if [ $imposedepth == 1 ]; then
-	  run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
-         else
-          if [ $imposewgtvel == 1 ]; then
-           run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${wgtvel}"
-	  else
-	   run_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
-	  fi
-	 fi
-	fi
-	ad_folder="run_ad_${sliding}_snap"
-	if [ $gentim == 'genarr' ]; then
-		build_dir=build_genarr
-	        cd $input_dir; 
-	        cd $OLDPWD
-	else 
-		build_dir=build_gentim
-	        cd $input_dir; 
-	        cd $OLDPWD
-	fi
-fi
-
+# Print the next available folder name
+run_folder=${run_ad_folder}
 
 echo $run_folder
 if [ $reStart == 'true' ]; then
@@ -140,12 +23,18 @@ fi
 
 # Empty the run directory - but first make sure it exists!
 if [ -d "../$run_folder" ]; then
+  mv $output_param_file ../$run_folder
   cd ../$run_folder
   rm -rf *
 else
   mkdir ../$run_folder
+  mv $output_param_file ../$run_folder
   cd ../$run_folder
 fi
+
+output_param_file="params_file.txt"
+ln -s ../archer_scripts/write_params.sh .
+source ./write_params.sh
 
 
 cp $input_dir/*bin ./
@@ -155,11 +44,16 @@ cp ../archer_scripts/opt_script.csh ./
 if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 stroptiter="itermax=200"
 else
-stroptiter="itermax=40"
+stroptiter="itermax=$numInvIter"
 fi
 
 sed "s/.*itermax=.*/$stroptiter/" opt_script.csh > temp
 mv temp opt_script.csh
+
+stroptiter="if [ \$((i % $numInvSaveRun)) -eq 0 ]; then"
+sed "s/.*if [ $((i % 1)) -eq 0 ].*/$stroptiter/" opt_script.csh > temp
+mv temp opt_script.csh
+
 
 ln -s ../archer_scripts/add0upto3c .
 ln -s ../archer_scripts/clear_optim.sh .
@@ -182,6 +76,16 @@ fi
 strdepth=" streamice_bdot_depth_nomelt = $bdotdepth"
 sed "s/.*streamice_bdot_depth_nomelt.*/$strdepth/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
+
+if [ $meltconst != 'n' ]; then
+ str=$(grep streamice_bdot_maxmelt data.streamice); 
+ val="${str##*=}"; 
+ meltnum=$(( $val + $meltconst ))
+ strmelt=" streamice_bdot_maxmelt = $meltnum"
+ sed "s/.*streamice_bdot_maxmelt.*/$strmelt/" data.streamice > data.streamice.temp
+ mv data.streamice.temp data.streamice
+fi
+
 sed "s/.*reg_coulomb.*/$strcoul/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 sed "s/.*smooth_gl_width.*/$strsmooth/" data.streamice > data.streamice.temp
@@ -220,7 +124,9 @@ else
 	else
 	 rm data.ctrl
          cp -r $input_dir/data.ctrl_gentim data.ctrl
-
+	 strprecond="  gentim2dPrecond = ${precondMelt} ${precondBglen} ${precondBeta}"
+         sed "s/.*gentim2dPrecond.*/$strprecond/" data.ctrl > data.ctrl_temp;
+	 mv data.ctrl_temp data.ctrl
          if [ $melttype == 1 ]; then
 	  gentimperiod1=$(($melttype*$timestep*$ntimesteps/2))
          elif [ $melttype == 0 ]; then
@@ -258,7 +164,7 @@ else
 	fi
 
 
-	if [ $smithconstr == 'S' ] || [ $smithconstr == 'SC' ]; then
+	if [ $smithconstr == 'S' ] || [ $smithconstr == 'SC' ] || [ $smithconstr == 'SNV' ]; then
 	 strShelfConstr=" STREAMICEsurfOptimTCBasename = 'surface_constraints/CPOMSmith_surf',"
 	 sed "s|.*surfOptimTCBasename.*|${strShelfConstr}|" data.streamice > data.streamice.temp
 	 mv data.streamice.temp data.streamice
@@ -267,6 +173,12 @@ else
 	 mv data.streamice.temp data.streamice
 	 strShelfConstr=" STREAMICE_shelf_dhdt_ctrl = .true.,"
 	 sed "s|.*STREAMICE_shelf_dhdt_ctrl.*|${strShelfConstr}|" data.streamice > data.streamice.temp
+         mv data.streamice.temp data.streamice
+	fi
+
+	if [ $smithconstr == 'SNV' ]; then
+	 strShelfConstr=" STREAMICE_shelf_vel_ctrl = .false.,"
+	 sed "s|.*STREAMICE_shelf_vel_ctrl.*|${strShelfConstr}|" data.streamice > data.streamice.temp
          mv data.streamice.temp data.streamice
 	fi
 
@@ -296,6 +208,10 @@ else
 
 fi
 
+: <<'EOF'
+if [[ $bigconstr == 'mix' ]]; then
+  wgtsurf=1.
+fi
 if [[ $tdep == 'snap' ]] || [[ $tdep == 'snapBM' ]] ; then
   wgtsurf=0.
   wgtvel=1.
@@ -306,11 +222,11 @@ elif [[ $bigconstr == 'surf' ]]; then
   wgtsurf=1.0
 elif [[ $bigconstr == 'dhdt' ]]; then
   wgtsurf=0.0
-else
+elif [[ $imposewgtvel == 0 ]]; then
   wgtsurf=1.0
   wgtvel=0.0035
 fi
-
+EOF
 
 
 if [ $tdep == 'snapBM' ]; then
@@ -367,13 +283,10 @@ cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
 # Link executables
 
 
-ln -s ../$build_dir/mitgcmuv_ad .
+ln -s ../$build_dir/mitgcmuv_tap_adj .
 
 
 module load PrgEnv-gnu
-#module swap cray-mpich  cray-mpich/8.1.4
-#module load cray-hdf5-parallel/1.12.0.3
-#module load cray-netcdf-hdf5parallel/4.7.4.3
 
 
 optimdir=OPTIM

@@ -52,7 +52,7 @@ fi
 
 
 cd $ROOTDIR
-#git checkout branch_plot_misfit
+git checkout master
 cd $OLDPWD
 
 sing_str="-B $PWD:$HOME /work/n02/n02/dngoldbe/oad_sing/openad.sif"

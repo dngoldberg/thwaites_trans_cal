@@ -19,54 +19,27 @@ echo Sync start `date` >> times
 echo Sync start seconds `date +%s` >> times
 
 run_folder=$1
+exp_folder=$2
 
 cd $SLURM_SUBMIT_DIR/..
-tar -czvf ${run_folder}.tgz ${run_folder}/outputoptiter* ${run_folder}/runoptiter* ${run_folder}/gradcontrol ${run_folder}/err ${run_folder}/out ${run_folder}/*.bin ${run_folder}/*constraints
+tar -czvf ${run_folder}.tgz ${run_folder}/outputoptiter* ${run_folder}/runoptiter* ${run_folder}/gradcontrol ${run_folder}/err ${run_folder}/out ${run_folder}/*.bin ${run_folder}/*constraints ${run_folder}/params_file.txt
 
 if [ $HOMEHOST != 'null' ] ; then
 
-  HOMEDIR=$HOMEROOT/THWAITES
+  HOMEDIR=$HOMEROOT/THWAITES/${exp_folder}
 
   echo home folder $HOMEDIR
 
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR"
-#  scp -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos $i.tgz $HOMEHOST:$HOMEDIR
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL --remove-source-files ${run_folder}.tgz $HOMEHOST:$HOMEDIR
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; tar -xzvf \"${run_folder}\".tgz"
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; rm \"${run_folder}\".tgz"
   cd $run_folder
-#  rm -r OPTIM
-  mv runoptiter040 temprunoptiter040
+  cp -r runoptiter040 temprunoptiter040
   rm -r runoptiter*
-  mv temprunoptiter040 runoptiter040
-  rm runoptiter040/STD*
+  cp -r temprunoptiter040 runoptiter040
+  rm runoptiter*/STD*
 
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL *crash* $HOMEHOST:$HOMEDIR
-
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Lsurfdiag $HOMEHOST:$HOMEDIR/$run_folder
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Ldyndiag $HOMEHOST:$HOMEDIR/$run_folder
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Ocestate $HOMEHOST:$HOMEDIR/$run_folder
-
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Lstdoutoce $HOMEHOST:$HOMEDIR/$run_folder
-
-#  process_id=$!
-#  wait $process_id
-#  rm $Lsurfdiag
-
-
-#  process_id=$!
-#  wait $process_id
-#  rm $Lstdout
-
-#  process_id=$!
-#  wait $process_id
-#  rm $Ocestate
-
-#  rsync -avzL stateSalt.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateRho.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateUvel.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateVvel.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateWvel.nc $HOMEHOST:$HOMEDIR
 
 fi
 

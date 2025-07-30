@@ -52,8 +52,7 @@ do
  \rm tapelev*
  mv adxx* gradcontrol
  mv xx* gradcontrol
- if [ `expr $i % 5` -eq 0 ]
- then
+ if [ $((i % 1)) -eq 0 ]; then 
   direc=run$name$ii
   mkdir $direc
   rm maskCtrl* hFac* wunit* RA*ta DX*ta DY*ta DR*ta PH*ta
@@ -69,9 +68,9 @@ do
  ./optim.x > std$ii
  cd ..
 
- if [ $((i % 4)) -eq 0 ]; then
+ if [ $((i % 10)) -eq 0 ]; then 
      now=$(date +"%T")
-     costthin=$(grep "surface contr" $fich)
+     costthin=$(grep "thinning contr" $fich)
      costdhdt=$(grep "dhdt contr" $fich)
      costglen=$(grep "bglen smooth" $fich)
      costprio=$(grep "prior smooth" $fich) 

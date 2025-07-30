@@ -28,163 +28,17 @@ input_dir=../input_tc/
 #8 
 
 #8
+source ./parse_params.sh $1
 
-while read -r line; do
-   # Look for the correct line (if you have other parameters)
-   if [[ $line == Sliding:* ]]; then
-      sliding=$(echo "$line" | cut -c 10-);
-   fi;
-   if [[ $line == Timedep:* ]]; then
-      tdep=$(echo "$line" | cut -c 10-);
-   fi;
-   if [[ $line == MeltType:* ]]; then
-      melttype=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == GlenType:* ]]; then
-      glentype=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == BetaType:* ]]; then
-      betatype=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == Smith:* ]]; then
-      smithconstr=$(echo "$line" | cut -c 8-);
-   fi;
-   if [[ $line == BigConstr:* ]]; then
-      bigconstr=$(echo "$line" | cut -c 12-);
-   fi;
-   if [[ $line == gentim:* ]]; then
-      gentim=$(echo "$line" | cut -c 9-);
-   fi;
-   if [[ $line == proj:* ]]; then
-      proj=$(echo "$line" | cut -c 7-);
-   fi;
-   if [[ $line == longproj:* ]]; then
-      longproj=$(echo "$line" | cut -c 11-);
-   fi;
-   if [[ $line == meltconst:* ]]; then
-      meltconst=$(echo "$line" | cut -c 12-);
-   fi;
-   imposetikh=0
-   if [[ $line == tikhbeta:* ]]; then
-      tikhbeta=$(echo "$line" | cut -c 11-);
-      imposetikh=1
-   fi;
-   if [[ $line == tikhbglen:* ]]; then
-      tikhbglen=$(echo "$line" | cut -c 12-);
-      imposetikh=1
-   fi;
-   imposedepth=0
-   if [[ $line == bdotdepth:* ]]; then
-      bdotdepth=$(echo "$line" | cut -c 12-);
-      imposedepth=1
-   fi;
-   imposewgtvel=0
-   if [[ $line == wgtvel:* ]]; then
-      wgtvel=$(echo "$line" | cut -c 9-);
-      imposewgtvel=1
-   fi;
-done < $1
+strInvIter=`./add0upto3c $numInvIter`
 
-if [ x$sliding == x ]; then
-        sliding='coul'
-fi
-if [ x$tdep == x ]; then
-        tdep='tc'
-fi
-if [ x$melttype == x ]; then
-        melttype=g
-fi
-if [ x$glentype == x ]; then
-        glentype=0
-fi
-if [ x$betatype == x ]; then
-        betatype=0
-fi
-if [ x$smithconstr == x ]; then
-        smithconstr='NS'
-fi
-if [ x$bigconstr == x ]; then
-        bigconstr='surf'
-fi
-if [ x$gentim == x ]; then
-        gentim='gentim'
-fi
-if [ x$proj == x ]; then
-        proj='last'
-fi
-if [ x$longproj == x ]; then
-        longproj=50
-fi
-if [ x$meltconst == x ]; then
-        meltconst="n"
-else
-        meltapp="_${meltconst}"
-fi
-if [ x$tikhbeta == x ]; then
-        tikhbeta='0.1e5'
-fi
-if [ x$tikhbglen == x ]; then
-        tikhbglen='0.1e5'
-fi
-if [ x$bdotdepth == x ]; then
-        bdotdepth=0
-fi
-if [ x$wgtvel == x ]; then
-        wgtvel=0.000
-fi
-
-
-if [ $gentim == "gentimlong" ] && [ $longproj == 0 ]; then
-	echo "badrun"
-	exit
-fi
-
-if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
-	run_folder="run_val_${sliding}_${tdep}_${longproj}${meltapp}_${meltconst}"
-        run_ad_folder="run_ad_${sliding}_$tdep"	
-else
-	#if [ $imposedepth == 1 ]; then
-        #  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
-        #  run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${bdotdepth}"
-        #else
-        #  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
-        #  run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
-        #fi
-
-#	if [ $imposetikh == 1 ]; then
-#         run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
-#	 run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${tikhbeta}"
-#        else
-#	 if [ $imposedepth == 1 ]; then
-#	  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
-#          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${bdotdepth}"
-#         else
-#	  run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
-#          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
-#	 fi
-#	fi
-
-	if [ $imposetikh == 1 ]; then
-         run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${tikhbeta}"
-	 run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${tikhbeta}"
-        else
-         if [ $imposedepth == 1 ]; then
-          run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${bdotdepth}"
-          run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${bdotdepth}"
-         else
-          if [ $imposewgtvel == 1 ]; then
-           run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${wgtvel}"
-           run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}_${wgtvel}"
-          else
-           run_ad_folder="run_ad_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}"
-           run_folder="run_val_${sliding}_${tdep}_${gentim}_${melttype}${glentype}${betatype}${smithconstr}_${bigconstr}_${proj}_${longproj}${meltapp}_${meltconst}"
-          fi
-         fi
-        fi
-fi
+output_param_file="params_file.txt_$(date +"%F%T.%6N")"
+source ./write_params.sh
+source ./get_run_folders.sh
 
 build_dir=build_validate
 echo $run_folder
+#echo $run_ad_folder
 
 # Empty the run directory - but first make sure it exists!
 if [ -d "../$run_folder" ]; then
@@ -195,12 +49,18 @@ else
   cd ../$run_folder
 fi
 
+rm $output_param_file
+output_param_file="params_file.txt"
+slid=sys.argv[1]
+ln -s ../archer_scripts/write_params.sh .
+source ./write_params.sh
+
 
 ln -s $input_dir/* .
 
 if [ $tdep == "tc" ]; then
  cd ../archer_scripts;
- python prepare_validation_controls_const.py 40 $run_ad_folder $run_folder $proj $melttype $glentype $betatype $meltconst
+ python prepare_validation_controls_const.py $numInvIter $run_ad_folder $run_folder $proj $melttype $glentype $betatype $meltconst
  cd $OLDPWD
 fi
 
@@ -214,13 +74,23 @@ cp -f $input_dir/data.streamice ./
 rm -f data.diagnostics
 cp -f $input_dir/data.diagnostics ./
 
-if [ $tdep == "snap" ]; then
- if [ meltconst != "n" ]; then
-  meltnum=$(( 50 + $meltconst ))
-  strmelt=" streamice_bdot_maxmelt = $meltnum"
-  sed "s/.*streamice_bdot_maxmelt .*/$strmelt/" data.streamice > data.streamice.temp
-  mv data.streamice.temp data.streamice
- fi
+#if [ $tdep == "snap" ]; then
+# if [ meltconst != "n" ]; then
+#  meltnum=$(( 50 + $meltconst ))
+#  strmelt=" streamice_bdot_maxmelt = $meltnum"
+#  sed "s/.*streamice_bdot_maxmelt .*/$strmelt/" data.streamice > data.streamice.temp
+#  mv data.streamice.temp data.streamice
+# fi
+#fi
+
+
+if [ $meltconst != "n" ]; then
+ str=$(grep streamice_bdot_maxmelt data.streamice); 
+ val="${str##*=}"; 
+ meltnum=$(( $val + $meltconst ))
+ strmelt=" streamice_bdot_maxmelt = $meltnum"
+ sed "s/.*streamice_bdot_maxmelt.*/$strmelt/" data.streamice > data.streamice.temp
+ mv data.streamice.temp data.streamice
 fi
 
 if [ $sliding == 'weert' ]; then
@@ -272,7 +142,7 @@ if [ $tdep != "snap" ] && [ $tdep != "snapBM" ]; then
  else
   strpickup=" pickupsuff='ckptA'"
  fi
- cp ../$run_ad_folder/runoptiter040/pickup*ckptA* ./
+ cp ../$run_ad_folder/runoptiter${strInvIter}/pickup*ckptA* ./
 else
  if [ $tdep == "snapBM" ]; then
   if [ $longproj == 0 ]; then
@@ -319,11 +189,11 @@ if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
  sed "s/.*cfricTimeDepFile.*/$betatd/" data.streamice > data.streamice.temp
  mv data.streamice.temp data.streamice
  if [ $1 == 'coul' ]; then
-                python get_beta_bglen.py Coul 100 $run_ad_folder $run_folder
+                python get_beta_bglen.py Coul $numInvIter $run_ad_folder $run_folder
                 strBeta=" STREAMICEbasaltracFile = 'BetaCoul.bin',"
                 strBglen=" STREAMICEglenconstfile = 'BglenCoul.bin',"
  else
-                python get_beta_bglen.py Weert 100  $run_ad_folder $run_folder
+                python get_beta_bglen.py Weert $numInvIter $run_ad_folder $run_folder
                 strBeta=" STREAMICEbasaltracFile = 'BetaWeert.bin',"
                 strBglen=" STREAMICEglenconstfile = 'BglenWeert.bin',"
  fi
