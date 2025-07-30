@@ -10,5 +10,5 @@
   xx_genarr2d_weight(2) = 'wunit',
   xx_genarr2d_file(3)   = 'xx_beta',
   xx_genarr2d_weight(3) = 'wunit',
-  genarr2dPrecond = 0.25 1.0 1.0
+  genarr2dPrecond = 0.1 0.1 1.0
  /

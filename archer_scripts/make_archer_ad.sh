@@ -52,7 +52,7 @@ fi
 
 
 cd $ROOTDIR
-git checkout master
+git checkout branch_streamice_generic_ctrl_reg
 cd $OLDPWD
 
 sing_str="-B $PWD:$HOME /work/n02/n02/dngoldbe/oad_sing/openad.sif"

@@ -14,5 +14,5 @@
   xx_gentim2d_weight(3) = 'wunit',
   xx_gentim2d_period(3) = 0.0
   xx_gentim2d_glosum(1) = .false.
-  gentim2dPrecond = .1 1.0 1.0
+  gentim2dPrecond = 0.1 1.0 1.0
  /

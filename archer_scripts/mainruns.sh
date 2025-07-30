@@ -40,7 +40,7 @@ rm exp_snap.txt
 jobid1=-1
 jobid2=-1
 
-for wgtvel in 0.0025 0.0035; do
+for wgtvel in 0.00675 0.006;  do
 
 	sed "s/.*BigConstr.*/BigConstr: vel/" exp_main.txt > temp
 	sed "s/.*wgtvel.*/wgtvel: $wgtvel/" temp > temp2

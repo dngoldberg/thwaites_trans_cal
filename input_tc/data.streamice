@@ -43,19 +43,14 @@
  streamice_allow_reg_coulomb = .false.
  streamice_bdot_depth_nomelt = 0.
  streamice_bdot_depth_maxmelt = -700.
- streamice_bdot_maxmelt = 65.
+ streamice_bdot_maxmelt = 65
  streamice_bdot_exp = 1.
  STREAMICEcostMaskFile = ''
- STREAMICE_shelf_dhdt_ctrl = .false.
  STREAMICEBdotMaxMeltFile = ''
  bdotMaxmeltTimeDepFile = ''
  bglenTimeDepFile=''
  cfricTimeDepFile=''
-# streamice_forcing_period = 0.
-# streamice_vel_ext = .true.
-# STREAMICE_uvel_ext_file = 'uext.bin'
-# STREAMICE_vvel_ext_file = 'vext.bin'
-# streamice_smooth_gl_width = 10.
+ STREAMICE_shelf_dhdt_ctrl = .false.
  &
 
  &STREAMICE_PARM02
