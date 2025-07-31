@@ -283,7 +283,7 @@ cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
 # Link executables
 
 
-ln -s ../$build_dir/mitgcmuv_tap_adj .
+ln -s ../$build_dir/mitgcmuv_ad .
 
 
 module load PrgEnv-gnu
