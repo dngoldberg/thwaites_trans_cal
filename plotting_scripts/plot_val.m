@@ -2,9 +2,15 @@ function [metric_vel metric_acc metric_surf metric_dhdt dvafdt_err T Vaf Tobs1 T
 addpath('/home/dgoldber/network_links/datastore/ice_data/ThwaitesDataProphet/CODE');
 addpath('/exports/geos.ed.ac.uk/iceocean/dgoldber/MITgcm_forinput/thwaites_trans_cal/plotting_scripts');
 
-global rlow I J infile  SURF       THICK      VX         VY  times
+global rlow I J infile  SURF       THICK      VX         VY  times niter_inv
 
 %close all
+
+if (isempty(niter_inv))
+    niter=40;
+else
+    niter=niter_inv;
+end
 
 if (~isempty(morlighem_mat_file))
     read_issm = true
@@ -48,11 +54,12 @@ if (~read_issm)
 	if (strcmp(parts{end},'truncmelt'));
         ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7} '_truncmelt'];
 	else
+	ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7}];
 	if (length(parts)>10);
-        ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7} '_' parts{11}];
-	else
-        ad_folder=['run_ad_' parts{3} '_' parts{4} '_' parts{5} '_' parts{6} '_' parts{7}];
-	end
+        for i=1:(length(parts)-10);
+            ad_folder=[ad_folder '_' parts{i+10}];
+        end
+    end
 	end
         if (strcmp(parts{5},'gentimlong'));
             folder_start = 156;
@@ -65,10 +72,10 @@ if (~read_issm)
  if (isempty(ad_folder))
     h0 = rdmds('H_streamiceinit')';
  else
-    h0 = rdmds(['../' ad_folder '/runoptiter040/H_streamiceinit'])';
+    h0 = rdmds(['../' ad_folder '/runoptiter' appNum(niter,3) '/H_streamiceinit'])';
  end
 else
- base_folder = '/exports/geos.ed.ac.uk/iceocean/dgoldber/archer_output/THWAITES/run_ad_coul_tc_gentim_g00S_surf/runoptiter040';
+ base_folder = ['/exports/geos.ed.ac.uk/iceocean/dgoldber/archer_output/THWAITES/run_ad_coul_tc_gentim_g00S_surf/runoptiter' appNum(niter,3)];
  tempStruct=load(morlighem_mat_file,'BED');
  rlow = (tempStruct.BED);
  tempStruct=load(morlighem_mat_file,'INITTHICK');
