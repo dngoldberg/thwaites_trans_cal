@@ -1,7 +1,55 @@
 #!/bin/bash
 ################################################
-# Start a self-resubmitting simulation.
-################################################
+
+# Start a calibration run.
+# To be run on the ARCHER2 Supercomputer.
+
+# This script takes 3 arguments:
+#   1. a path to a parameter file
+#   2. a JobID (will wait until that job is finished to start new batch
+#      (-1 otherwise)
+#   3. a flag (1 or 0) to indicate submission of validation job once the 
+#      calibration is finished
+#
+#
+#   The parameter file specifies (up to) 21 operational parameters
+#    (see exp_main.txt in folder) 
+#
+#   Sliding:       [coul / weert] the sliding law to be used in the simulation
+#   Timedep:       [tc / snap] specify transient or snapshot calibration
+#   MeltType:      [G / g / 1 / 0] set melt rate control to be distributed 
+#                               (either 1 or 0) or global (G or g); and 
+#                               to be time-varying (G or 1) or time-constant
+#                               (g or 0)
+#   GlenType:      [0 / 1] set Bglen control to be time-varying (1) or constant (0)
+#   BetaType:      [0 / 1] set Beta control to be time-varying (1) or constant (0)
+#   Smith:         [S / NS] include/exclude ice-shelf constraints from Smith 2020
+#   BigConstr:     [vel / surf / mix] determines whether the run is a vel-only, 
+#                                   surf-only or mixed calibration (for post-
+#                                   processing purposes only)
+#   gentim:        [gentim / snap] should be set to "gentim" if "Timedep" is "tc"
+#   proj:          [min/max/last/mean] the method of selecting validation controls if 
+#                                calibration is time-varying
+#   longproj:      length of validation run (y) after calibration period (2004-2012)
+#                  and validation (2012-2017). should be set to 50.
+#   meltconst:     perturbation to deep melt rate (m/a). "n" if zero.
+#   tikhbeta:      tikhonov smoothing coefficient for beta
+#   tikhbglen:     tikhonov smoothing coefficient for bglen
+#   bdotdepth:     depth at which melt rate = 0
+#   wgtvel:        cost coefficient of velocity misfit in transient cal
+#   wgtsurf:       cost coefficient of surface misfit in transient cal
+#   Restart:       set to false
+#   precondMelt:   gradient scaling of melt ctrl
+#   precondBeta:   gradient scaling of beta
+#   precondBglen:  gradient scaling of bglen
+#   numInvIter:    # of iterations
+#   numInvSaveRun: frequency (of iterations with which to save the experiment diagnostics
+#   expFolder:     for postprocessing purposes
+#
+#
+#   the file will be passed to md5sum to give a unique ID for the experiment
+
+########################################################################
 
 # ID number for run
 
