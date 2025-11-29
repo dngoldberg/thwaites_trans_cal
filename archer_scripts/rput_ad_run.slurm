@@ -20,6 +20,8 @@ echo Sync start seconds `date +%s` >> times
 
 run_folder=$1
 exp_folder=$2
+paramfile=$3
+source ./parse_params.sh ${run_folder}/$paramfile
 
 cd $SLURM_SUBMIT_DIR/..
 tar -czvf ${run_folder}.tgz ${run_folder}/outputoptiter* ${run_folder}/runoptiter* ${run_folder}/gradcontrol ${run_folder}/err ${run_folder}/out ${run_folder}/*.bin ${run_folder}/*constraints ${run_folder}/params_file.txt
@@ -35,9 +37,11 @@ if [ $HOMEHOST != 'null' ] ; then
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; tar -xzvf \"${run_folder}\".tgz"
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; rm \"${run_folder}\".tgz"
   cd $run_folder
-  cp -r runoptiter040 temprunoptiter040
+
+  ii=`./add0upto3c $numInvIter`
+  cp -r runoptiter${ii} temprunoptiter${ii}
   rm -r runoptiter*
-  cp -r temprunoptiter040 runoptiter040
+  cp -r temprunoptiter${ii} runoptiter${ii}
   rm runoptiter*/STD*
 
 

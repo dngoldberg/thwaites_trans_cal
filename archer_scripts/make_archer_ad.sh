@@ -18,6 +18,9 @@ module load cray-hdf5-parallel
 PETSCDIR=/work/n02/n02/dngoldbe/petsc/
 export LD_LIBRARY_PATH=/work/n02/n02/dngoldbe/petsc/lib:$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
+numgen=0
+numtim=3
+
 if [ $1 == "genarr" ]; then
 	echo "DO NOT USE genarr option"
 	exit
@@ -28,6 +31,8 @@ elif [ $1 == "gentim" ]; then
         numgen=0
         numtim=3
 fi
+
+echo $numgen
 
 code_dir=code
 strgen="      parameter ( maxCtrlArr2D = $numgen )"

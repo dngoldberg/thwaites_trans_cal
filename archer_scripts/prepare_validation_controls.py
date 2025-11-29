@@ -57,6 +57,7 @@ if (int(beta_mode)==1):
 else:
     beta_control_new = beta_control
 
+
 s = np.shape(bglen_control_new)
 if (len(s)==3):
     bglen_ax=s[0]

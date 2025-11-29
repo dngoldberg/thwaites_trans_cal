@@ -60,7 +60,7 @@ ln -s $input_dir/* .
 
 if [ $tdep == "tc" ]; then
  cd ../archer_scripts;
- python prepare_validation_controls_const.py $numInvIter $run_ad_folder $run_folder $proj $melttype $glentype $betatype $meltconst
+ python prepare_validation_controls_const.py $numInvIter $run_ad_folder $run_folder $proj $melttype $glentype $betatype
  cd $OLDPWD
 fi
 

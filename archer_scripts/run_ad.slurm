@@ -36,17 +36,18 @@ RES=$(sbatch --job-name=EML -A $HECACC /work/n02/n02/dngoldbe/mitgcm/scripts/ema
 
 bash opt_script.csh
 
+if [ $3 == 1 ]; then
+bash submit_val.sh ../$run_folder/$paramfile
+fi
+
 cd ../archer_scripts
 module load cray-python
 source /work/n02/n02/dngoldbe/myenv/bin/activate
 export PYTHONPATH="${PYTHONPATH}:/work/n02/n02/dngoldbe/MITgcm/utils/python/MITgcmutils/MITgcmutils/"
 source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
-RES=$(sbatch --job-name=DOWNLOAD -A $HECACC rput_ad_run.slurm $run_folder $expFolder)
+RES=$(sbatch --job-name=DOWNLOAD -A $HECACC rput_ad_run.slurm $run_folder $expFolder $paramfile)
 echo $RES rput_run_ad.slurm $run_folder >> job_id_list
 
-if [ $3 == 1 ]; then
-bash submit_val.sh ../$run_folder/$paramfile
-fi
 
 end_time=$(date +%s)
 totaltime=$(((end_time-start_time)/60))
