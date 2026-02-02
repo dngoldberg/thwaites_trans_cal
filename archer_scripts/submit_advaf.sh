@@ -23,8 +23,7 @@ else
 	exit
 fi
 
-#./prepare_run_ad.sh $1 $2 $3 $4 $5 $6 $7
-output=$(bash prepare_run_validate.sh $1) 
+output=$(bash prepare_run_advaf.sh $1) 
 
 nm=$(echo $output|cut -d ' ' -f1)
 echo $output
@@ -36,5 +35,5 @@ echo $HECACC
 # submit the job chain
 cp $1 ../$nm
 source ./parse_params.sh $1
-RES=$(sbatch --job-name=ice_$nm -A n02-GRISLAKES run_val.slurm $nm $expFolder)
-echo $RES run_val.slurm $1 $nm $expFolder >> job_id_list
+RES=$(sbatch --job-name=ice_$1 -A n02-GRISLAKES run_advaf.slurm $nm)
+echo $RES run_advaf.slurm $1 $nm >> job_id_list

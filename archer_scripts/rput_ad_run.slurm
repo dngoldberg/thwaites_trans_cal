@@ -21,7 +21,8 @@ echo Sync start seconds `date +%s` >> times
 run_folder=$1
 exp_folder=$2
 paramfile=$3
-source ./parse_params.sh ${run_folder}/$paramfile
+source ./parse_params.sh $SLURM_SUBMIT_DIR/../${run_folder}/$paramfile
+echo "numInvIter: $numInvIter"
 
 cd $SLURM_SUBMIT_DIR/..
 tar -czvf ${run_folder}.tgz ${run_folder}/outputoptiter* ${run_folder}/runoptiter* ${run_folder}/gradcontrol ${run_folder}/err ${run_folder}/out ${run_folder}/*.bin ${run_folder}/*constraints ${run_folder}/params_file.txt
@@ -39,10 +40,11 @@ if [ $HOMEHOST != 'null' ] ; then
   cd $run_folder
 
   ii=`./add0upto3c $numInvIter`
-  cp -r runoptiter${ii} temprunoptiter${ii}
-  rm -r runoptiter*
-  cp -r temprunoptiter${ii} runoptiter${ii}
-  rm runoptiter*/STD*
+  cp -rv runoptiter${ii} temprunoptiter${ii}
+  rm -rv runoptiter*
+  cp -rv temprunoptiter${ii} runoptiter${ii}
+  rm -v runoptiter*/STD*
+  rm -v OPTIM/OPWARM*
 
 
 fi

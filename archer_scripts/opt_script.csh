@@ -51,7 +51,7 @@ do
  echo Cleaning
  \rm tapelev*
  mv adxx* gradcontrol
- mv xx* gradcontrol
+ mv xx*ta gradcontrol
  if [ $((i % 1)) -eq 0 ]; then 
   direc=run$name$ii
   mkdir $direc
@@ -91,9 +91,9 @@ rm ecco_c*
 
 exit
 
-for i in $(ls -d runoptiter*00); do 
- mv $i SAVE$i;
-done
+#for i in $(ls -d runoptiter*00); do 
+# mv $i SAVE$i;
+#done
 #rm OPTIM/OPWARM*
 
 

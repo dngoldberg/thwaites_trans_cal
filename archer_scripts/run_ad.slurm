@@ -22,6 +22,7 @@ source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
 run_folder=$1
 paramfile=$2
 expFolder=$4
+depFile=$5
 
 cd $SLURM_SUBMIT_DIR/../$run_folder
 
@@ -34,20 +35,26 @@ RES=$(sbatch --job-name=EML -A $HECACC /work/n02/n02/dngoldbe/mitgcm/scripts/ema
 #echo $RES EMAIL >> job_id_list
 
 
-bash opt_script.csh
-
-if [ $3 == 1 ]; then
-bash submit_val.sh ../$run_folder/$paramfile
-fi
-
-cd ../archer_scripts
 module load cray-python
 source /work/n02/n02/dngoldbe/myenv/bin/activate
 export PYTHONPATH="${PYTHONPATH}:/work/n02/n02/dngoldbe/MITgcm/utils/python/MITgcmutils/MITgcmutils/"
 source /work/n02/n02/dngoldbe/mitgcm/scripts/mit_archer.sh
+
+if [ "$depFile" != "-1" ]; then
+        cd ../archer_scripts
+       	bash prepare_run_ad.sh $paramfile $depFile
+	cd ../$run_folder
+fi
+
+bash opt_script.csh
+
+cd ../archer_scripts
+if [ $3 == 1 ]; then
+bash submit_val.sh ../$run_folder/params_file.txt
+fi
+
 RES=$(sbatch --job-name=DOWNLOAD -A $HECACC rput_ad_run.slurm $run_folder $expFolder $paramfile)
 echo $RES rput_run_ad.slurm $run_folder >> job_id_list
-
 
 end_time=$(date +%s)
 totaltime=$(((end_time-start_time)/60))

@@ -36,9 +36,11 @@ output_param_file="params_file.txt_$(date +"%F%T.%6N")"
 source ./write_params.sh
 source ./get_run_folders.sh
 
-build_dir=build_validate
+build_dir=build_advaf
+run_folder=$run_advaf_folder
+#run_ad_folder=$run_ad_folder
 echo $run_folder
-#echo $run_ad_folder
+echo $run_ad_folder
 
 # Empty the run directory - but first make sure it exists!
 if [ -d "../$run_folder" ]; then
@@ -56,12 +58,13 @@ ln -s ../archer_scripts/write_params.sh .
 source ./write_params.sh
 
 
-cp $input_dir/*bin ./
+cp $input_dir/*.bin ./
 ln -s $input_dir/* .
 
 if [ $tdep == "tc" ]; then
  cd ../archer_scripts;
- python prepare_validation_controls_const.py $numInvIter $run_ad_folder $run_folder $proj $melttype $glentype $betatype
+ python prepare_adjoint_controls.py $run_ad_folder $run_folder 
+ #python prepare_validation_controls_const.py $numInvIter $run_ad_folder $run_folder $proj $melttype $glentype $betatype
  cd $OLDPWD
 fi
 
@@ -126,16 +129,16 @@ if [ $tdep != "snap" ] && [ $tdep != "snapBM" ]; then
    strniter=" niter0=156"
   fi
  else
-  strniter=" niter0=96"
+  strniter=" niter0=0"
   if [ $longproj == 0 ]; then
    ntimesteps=60
   elif [ $longproj == 50 ]; then
-   ntimesteps=660
+   ntimesteps=756
   elif [ $longproj == -1 ]; then
    ntimesteps=96
    strniter=" niter0=0"
   else
-   ntimesteps=$(( 12 * $longproj + 5 * 12 ))
+   ntimesteps=$(( 12 * $longproj + 13 * 12 ))
   fi
  fi
  if [ $longproj == -1 ]; then
@@ -149,7 +152,7 @@ else
   if [ $longproj == 0 ]; then
    ntimesteps=60
   else
-   ntimesteps=$(( 12 * $longproj + 5 * 12 ))
+   ntimesteps=$(( 12 * $longproj + 13 * 12 ))
   fi
   strniter=" niter0=0"
   strpickup=" pickupsuff=''"
@@ -191,8 +194,8 @@ if [ $tdep == "snap" ] || [ $tdep == "snapBM" ]; then
  mv data.streamice.temp data.streamice
  if [ $sliding == 'coul' ]; then
                 python get_beta_bglen.py Coul $numInvIter $run_ad_folder $run_folder
-                strBeta=" STREAMICEbasaltracFile = 'BetaCoul.bin',"
-                strBglen=" STREAMICEglenconstfile = 'BglenCoul.bin',"
+                strBeta=" STREAMICEbasaltracFile = 'Beta_coul.bin',"
+                strBglen=" STREAMICEglenconstfile = 'Bglen_coul.bin',"
  else
                 python get_beta_bglen.py Weert $numInvIter $run_ad_folder $run_folder
                 strBeta=" STREAMICEbasaltracFile = 'BetaWeert.bin',"
@@ -248,12 +251,57 @@ else
         fi	 
 fi 
 
+if [ $gentim == 'genarr' ]; then
+ 	 rm data.ctrl
+	 ln -s data.ctrl_genarr data.ctrl
+else
+	 rm data.ctrl
+         cp -r $input_dir/data.ctrl_gentim data.ctrl
+	 strprecond="  gentim2dPrecond = ${precondMelt} ${precondBglen} ${precondBeta}"
+         sed "s/.*gentim2dPrecond.*/$strprecond/" data.ctrl > data.ctrl_temp;
+	 mv data.ctrl_temp data.ctrl
+         if [ $melttype == 1 ]; then
+	  gentimperiod1=$(($melttype*$timestep*$ntimesteps/2))
+         elif [ $melttype == 0 ]; then
+	  gentimperiod1=0
+	 elif [ $melttype == G ]; then
+	  gentimperiod1=$(($timestep*$ntimesteps/2))
+	  strglob=" STREAMICE_use_global_ctrl = .true."
+	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
+	  mv data.streamice.temp data.streamice
+          strglob="  xx_gentim2d_glosum(1) = .true."
+	  sed "s/.*xx_gentim2d_glosum.*/$strglob/" data.ctrl > data.ctrl.temp;
+	  mv data.ctrl.temp data.ctrl
+	 elif [ $melttype == g ]; then
+	  gentimperiod1=0
+	  strglob=" STREAMICE_use_global_ctrl = .true."
+	  sed "s/.*STREAMICE_use_global_ctrl.*/$strglob/" data.streamice > data.streamice.temp;
+	  mv data.streamice.temp data.streamice
+	  strglob="  xx_gentim2d_glosum(1) = .true."
+	  sed "s/.*xx_gentim2d_glosum.*/$strglob/" data.ctrl > data.ctrl.temp;
+	  mv data.ctrl.temp data.ctrl
+	 fi
+         gentimperiod2=$(($glentype*$timestep*$ntimesteps/2))
+         gentimperiod3=$(($betatype*$timestep*$ntimesteps/2))
+
+         StrPeriod="  xx_gentim2d_period(1) = $gentimperiod1"
+         sed "s/.*xx_gentim2d_period(1).*/$StrPeriod/" data.ctrl > data.ctrl.temp; 
+	 mv data.ctrl.temp data.ctrl;
+         StrPeriod="  xx_gentim2d_period(2) = $gentimperiod2"
+         sed "s/.*xx_gentim2d_period(2).*/$StrPeriod/" data.ctrl > data.ctrl.temp; 
+	 mv data.ctrl.temp data.ctrl;
+         StrPeriod="  xx_gentim2d_period(3) = $gentimperiod3"
+         sed "s/.*xx_gentim2d_period(3).*/$StrPeriod/" data.ctrl > data.ctrl.temp; 
+	 mv data.ctrl.temp data.ctrl;
+
+fi
+
 
 
 sed "s/.*niter0.*/$strniter/" data > data.streamice.temp
 mv data.streamice.temp data
-sed "s/.*pickupsuff.*/$strpickup/" data > data.streamice.temp
-mv data.streamice.temp data
+#sed "s/.*pickupsuff.*/$strpickup/" data > data.streamice.temp
+#mv data.streamice.temp data
 
 sed "s/.*deltaT.*/$strdt/" data > data.streamice.temp
 mv data.streamice.temp data
@@ -284,12 +332,12 @@ StrPeriod="# streamice_forcing_period = $gentimperiod"
 sed "s/.*streamice_forcing_period.*/$StrPeriod/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
-cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
+#cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
 
 # Link executables
 
-strVelLev=" streamice_vel_cost_timesteps = 108 120 132 144 156"
-strThinLev=" streamice_surf_cost_timesteps = 156"
+strVelLev=" streamice_vel_cost_timesteps = "
+strThinLev=" streamice_surf_cost_timesteps = "
 #strVelLev=" streamice_vel_cost_timesteps = 12 24 36 48 60 72 84 96 108 120 132 144 156"
 #strThinLev=" streamice_surf_cost_timesteps = 36 96"
 if [ $longproj == 50 ] || [ $longproj == 0 ]; then
@@ -300,26 +348,5 @@ if [ $longproj == 50 ] || [ $longproj == 0 ]; then
 fi
 
 
-strconstrvel=" streamice_wgt_vel = 0.024"
-strconstrsurf=" streamice_wgt_surf = 1.0"
-if [ $longproj == -1 ] && [ $tdep == 'tc' ]; then
- if [[ $bigconstr == 'vel' ]]; then
-  strconstrvel=" streamice_wgt_vel = 0.024"
-  strconstrsurf=" streamice_wgt_surf = .01"
- elif [[ $bigconstr == 'surf' ]]; then
-  strconstrvel=" streamice_wgt_vel = 0.00024"
-  strconstrsurf=" streamice_wgt_surf = 1.0"
- elif [[ $bigconstr == 'mix' ]]; then
-  strconstrvel=" streamice_wgt_vel = 0.024"
-  strconstrsurf=" streamice_wgt_surf = 1.0"
- fi
-fi
-
-sed "s/.*streamice_wgt_vel =.*/$strconstrvel/" data.streamice > data.streamice.temp
-mv data.streamice.temp data.streamice
-sed "s/.*streamice_wgt_surf.*/$strconstrsurf/" data.streamice > data.streamice.temp
-mv data.streamice.temp data.streamice
-
-
-ln -s ../$build_dir/mitgcmuv .
+ln -s ../$build_dir/mitgcmuv_ad .
 

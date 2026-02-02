@@ -4,6 +4,7 @@ if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 
 	run_folder_pattern="run_val_${sliding}_${tdep}"
         run_ad_folder_pattern="run_ad_${sliding}_$tdep"
+        run_advaf_folder_pattern="run_advaf_${sliding}_$tdep"
         build_dir=build_snap
 
 else
@@ -11,6 +12,7 @@ else
 	run_folder_pattern="run_val_${sliding}_${tdep}_${bigconstr}"
         run_ad_folder_pattern="run_ad_${sliding}_${tdep}_${bigconstr}"
 	ad_folder="run_ad_${sliding}_snap"
+        run_advaf_folder_pattern="run_advaf_${sliding}_${tdep}_${bigconstr}"
 
         if [ $gentim == 'genarr' ]; then
                 build_dir=build_genarr
@@ -23,5 +25,6 @@ else
         fi
 fi
 
-run_folder="${run_folder_pattern}_${hash}"
 run_ad_folder="${run_ad_folder_pattern}_${hash}"
+run_advaf_folder="${run_advaf_folder_pattern}_${hash}"
+run_folder="${run_folder_pattern}_${hash}"

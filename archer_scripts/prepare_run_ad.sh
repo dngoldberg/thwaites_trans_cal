@@ -3,8 +3,18 @@
 # Clean out old results and link input files.
 ################################################
 
+
 code_dir=code
 input_dir=../input_tc/
+
+if [ -n	"$2" ]; then
+ source ./parse_params.sh $2
+ output_param_file="params_file.txt_$(date +"%F%T.%6N")"
+ source ./write_params.sh 
+ source ./get_run_folders.sh
+ run_folder_prev=${run_ad_folder}
+fi
+
 
 source ./parse_params.sh $1
 
@@ -16,10 +26,10 @@ source ./get_run_folders.sh
 run_folder=${run_ad_folder}
 
 echo $run_folder
+echo "prev run folder: ${run_folder_prev}" 
 if [ $reStart == 'true' ]; then
 	exit
 fi
-
 
 # Empty the run directory - but first make sure it exists!
 if [ -d "../$run_folder" ]; then
@@ -206,6 +216,23 @@ else
 	sed "s/.*STREAMICEglenconstfile.*/$strBglen/" data.streamice > data.streamice.temp
         mv data.streamice.temp data.streamice
 
+	if [ -n "${run_folder_prev}" ]; then
+        	ln -s ../archer_scripts/prepare_adjoint_controls.py
+        	python prepare_adjoint_controls.py $run_folder_prev $run_folder
+
+		strBeta=" STREAMICEbasaltracFile = 'xx_beta.bin',"
+                strBglen=" STREAMICEglenconstfile = 'xx_bglen.bin',"
+		strBdotMax=" STREAMICEBdotMaxMeltFile='xx_bdot_max.bin'"
+
+	       	sed "s/.*STREAMICEBdotMaxMeltFile.*/$strBdotMax/" data.streamice > data.streamice.temp
+                mv data.streamice.temp data.streamice
+		sed "s/.*STREAMICEbasaltracFile.*/$strBeta/" data.streamice > data.streamice.temp
+        	mv data.streamice.temp data.streamice
+		sed "s/.*STREAMICEglenconstfile.*/$strBglen/" data.streamice > data.streamice.temp
+        	mv data.streamice.temp data.streamice
+	else
+		echo "GOT HERE NO 2"
+	fi	
 fi
 
 : <<'EOF'
@@ -313,6 +340,7 @@ fi
 strgen="      parameter ( maxCtrlArr2D = $numgen )"
 strtim="      parameter ( maxCtrlTim2D = $numtim )"
 
+
 cd ../$code_dir 
 sed "s/.*parameter ( maxCtrlArr2D.*/$strgen/" CTRL_SIZE.h > data.streamice.temp
 mv data.streamice.temp CTRL_SIZE.h
@@ -321,8 +349,8 @@ mv data.streamice.temp CTRL_SIZE.h
 cd $OLDPWD
 
 
+
 cd OPTIM
-rm optim.x
 rm data.optim
 rm data.ctrl
 cd $builddir
@@ -330,12 +358,16 @@ cp ../../archer_scripts/Makefile ./
 str="                  -I../../$build_dir"
 sed "s@.*-I../../build_ad.*@$str@" Makefile > makefile_temp;
 mv makefile_temp Makefile
-make clean; make depend; make; 
+if [ -f "/home/n02/n02/dngoldbe/MITgcm/tools/xmakedepend" ]; then
+ rm optim.x
+ make clean; make depend; make; 
+fi 
 cd $OLDPWD
 cp $builddir/optim.x .
 ln -s ../data.optim .
 ln -s ../data.ctrl .
 cd ..
 ./clear_optim.sh
+
 
 

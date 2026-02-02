@@ -3,14 +3,18 @@ from scipy.io import loadmat
 import numpy as np
 import sys
 import glob
+import os
 
-invDir = int(sys.argv[1])
-run_direc = int(sys.argv[1])
+invDir = sys.argv[1]
+run_direc = sys.argv[2]
+
 
 print(invDir)
 
-paramfile = invDir + '/params_file.txt'
-with open(str(path)+ '/params_file.txt', 'r') as file:
+
+
+paramfile = '../' + invDir + '/params_file.txt'
+with open(paramfile, 'r') as file:
             lines = file.readlines()
 
 cfg_dict = {line.split(':')[0].strip(): line.split(':')[1].strip() for line in lines}
@@ -38,7 +42,7 @@ if (cfg_dict['MeltType']=='G'):
 else:
     melt_control_new = melt_control
 
-if (int(cfg_dict['BglenType'])==1):
+if (int(cfg_dict['GlenType'])==1):
     s=np.shape(bglen_control)
     bglen_control_new = np.zeros((s[0]+2,s[1],s[2]))
     bglen_control_new[:-2,:,:] = bglen_control
@@ -51,7 +55,7 @@ if (int(cfg_dict['BglenType'])==1):
 else:
     bglen_control_new = bglen_control
 
-if (int(cfg_dict['BetaMode'])==1):
+if (int(cfg_dict['BetaType'])==1):
     s=np.shape(beta_control)
     beta_control_new = np.zeros((s[0]+2,s[1],s[2]))
     beta_control_new[:-2,:,:] = beta_control
@@ -68,13 +72,29 @@ else:
 bglen_ax=1
 beta_ax=1
 
-#bglen0 = np.tile(rdmds('../' + direc + '/runoptiter' + str(invIter).zfill(3) + '/B_glen_sqrt'),(bglen_ax,1,1))
-#beta0 = np.tile(rdmds('../' + direc + '/runoptiter' + str(invIter).zfill(3) + '/C_basal_fric'),(beta_ax,1,1))
-bglen0 = np.fromfile('../' + invDir + '/BetaCoul.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(beta_control_new)
-beta0 = np.fromfile('../' + invDir + '/BglenCoul.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(bglen_control_new)
+if (os.path.exists(os.path.join(os.getcwd(), '..', invDir, 'xx_beta.bin'))):
+ beta0 = np.fromfile('../' + invDir + '/xx_beta.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(beta_control_new))
+else:                   
+ beta0 = np.fromfile('../' + invDir + '/BetaCoul.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(beta_control_new))
 
-
-melt_control_new.byteswap().tofile('../' + run_direc + '/xx_bdot_max.bin')
 (beta0+beta_control_new).byteswap().tofile('../' + run_direc + '/xx_beta.bin')
+
+########################################
+
+if (os.path.exists(os.path.join(os.getcwd(), '..', invDir, 'xx_bglen.bin'))):
+ bglen0 = np.fromfile('../' + invDir + '/xx_bglen.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(bglen_control_new))
+else:                   
+ bglen0 = np.fromfile('../' + invDir + '/BglenCoul.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(bglen_control_new))
+
 (bglen0+bglen_control_new).byteswap().tofile('../' + run_direc + '/xx_bglen.bin')
+                                                                                                   
+########################################
+
+if (os.path.exists(os.path.join(os.getcwd(), '..', invDir, 'xx_bdot_max.bin'))):
+ bdot0 = np.fromfile('../' + invDir + '/xx_bdot_max.bin',count=-1,dtype='float64').byteswap().reshape(np.shape(melt_control_new))
+ (bdot0+melt_control_new).byteswap().tofile('../' + run_direc + '/xx_bdot_max.bin')
+else:                   
+ melt_control_new.byteswap().tofile('../' + run_direc + '/xx_bdot_max.bin')
+
+
 

@@ -59,8 +59,8 @@
 TIMEQSTART="$(date +%s)"
 #echo Start-time `date` >> ../run_forward/times
 
-if [ $# -lt 3 ]; then
-	echo "pass a file, then a dependency (-1 if none), validation flag optional"
+if [ $# -lt 4 ]; then
+	echo "pass a file, then a dependency ID (-1 if none), then a dependency params file (-1 if none), validation flag optional"
 	exit
 fi
 
@@ -77,21 +77,29 @@ fi
 #	val=1
 #fi
 
-if [ $# -eq 3 ]; then
- val=$3
+if [ $# -eq 4 ]; then
+ val=$4
 else
  val=1
 fi
-dep=$2
-
-
-output=$(bash prepare_run_ad.sh $1) 
+depID=$2
+depFile=$3
+echo $depFile
+if [ "$depFile" == "-1" ]; then
+	output=$(bash prepare_run_ad.sh $1)
+else
+ if [ "$depID" == "-1" ]; then
+	output=$(bash prepare_run_ad.sh $1 $depFile)
+ else
+	output=$(bash prepare_run_ad.sh $1)
+ fi
+fi
 echo $output
 
 nm=$(echo $output|cut -d ' ' -f1)
-
+echo $nm
 #echo $output
-#echo "GOT HERE DONE PREPARE"
+echo "GOT HERE DONE PREPARE"
 
 #echo $JOBNO
 #echo $TIMEQSTART
@@ -100,11 +108,11 @@ nm=$(echo $output|cut -d ' ' -f1)
 #
 cp $1 ../$nm
 source ./parse_params.sh $1
-if [ $dep -ne -1 ]; then
- RES=$(sbatch --job-name=ice_$1 --dependency=$dep -A n02-GRISLAKES run_ad.slurm $nm $1 $val $expFolder)
+if [ $depID -ne -1 ]; then
+ RES=$(sbatch --job-name=ice_${nm} --dependency=$depID -A n02-GRISLAKES run_ad.slurm $nm $1 $val $expFolder $depFile)
 else
 # echo "DO NOT RUN"
- RES=$(sbatch --job-name=ice_$1 -A n02-GRISLAKES run_ad.slurm $nm $1 $val $expFolder)
+ RES=$(sbatch --job-name=ice_${nm} -A n02-GRISLAKES run_ad.slurm $nm $1 $val $expFolder -1)
 fi
 echo $RES run_ad.slurm $1 $nm $expFolder >> job_id_list
 jobid=$(echo $RES | awk '{print $4}')
