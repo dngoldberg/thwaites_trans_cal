@@ -52,7 +52,7 @@ fi
 
 
 cd $ROOTDIR
-git checkout branch_tap_cg2d_fp
+git checkout master
 cd $OLDPWD
 
 
@@ -61,13 +61,14 @@ cd $OLDPWD
 
 
 make CLEAN
-$ROOTDIR/tools/genmake2 -mods=../$code_dir -of=$HOME/own_scripts/dev_linux_amd64_cray_archer2_oad -tap -mpi -taparg='-defaultnocheckpoint -nooptim adjointliveness' '-tapgcc=-D ADSTACK_PROFILE -D ADSTACK_PREFETCH' -tapthread 
+$ROOTDIR/tools/genmake2 -mods=../$code_dir -of=$HOME/own_scripts/dev_linux_amd64_cray_archer2_oad -tap -mpi -tap_extra='-defaultnocheckpoint -nooptim adjointliveness' 
 #$ROOTDIR/tools/genmake2 -ieee -mods='../code ../newcode' -of=$ROOTDIR/tools/build_options/linux_amd64_gfortran -mpi
 #$ROOTDIR/tools/genmake2 -mods='../code' -mpi
 make depend
 #ln -s $PETSCDIR/include/*.mod .
 echo $LD_LIBRARY_PATH
 make -j tap_adj
+ln -s mitgcmuv_tap_adj mitgcmuv_ad
 
 # Switch Programming Environment back
 #module swap PrgEnv-intel PrgEnv-cray

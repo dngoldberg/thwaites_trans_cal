@@ -82,16 +82,21 @@ if [ $# -eq 4 ]; then
 else
  val=1
 fi
+
+if [ $# -eq 5 ]; then
+ tap=_tap
+fi
+
 depID=$2
 depFile=$3
 echo $depFile
 if [ "$depFile" == "-1" ]; then
-	output=$(bash prepare_run_ad.sh $1)
+	output=$(bash prepare_run_ad.sh $1 -1 $tap)
 else
  if [ "$depID" == "-1" ]; then
-	output=$(bash prepare_run_ad.sh $1 $depFile)
+	output=$(bash prepare_run_ad.sh $1 $depFile $tap)
  else
-	output=$(bash prepare_run_ad.sh $1)
+	output=$(bash prepare_run_ad.sh $1 -1 $tap)
  fi
 fi
 echo $output

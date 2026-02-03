@@ -1,11 +1,12 @@
 hash=$(md5sum < $output_param_file | cut -d' ' -f1 | cut -c1-12)
 
+
 if [ $tdep == 'snap' ] || [ $tdep == 'snapBM' ]; then
 
 	run_folder_pattern="run_val_${sliding}_${tdep}"
         run_ad_folder_pattern="run_ad_${sliding}_$tdep"
         run_advaf_folder_pattern="run_advaf_${sliding}_$tdep"
-        build_dir=build_snap
+        build_dir=build_snap$tap
 
 else
 
@@ -19,7 +20,7 @@ else
                 cd $input_dir;
                 cd $OLDPWD
         else
-                build_dir=build_gentim
+                build_dir=build_gentim$tap
                 cd $input_dir;
                 cd $OLDPWD
         fi

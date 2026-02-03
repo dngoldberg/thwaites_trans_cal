@@ -7,7 +7,7 @@
 code_dir=code
 input_dir=../input_tc/
 
-if [ -n	"$2" ]; then
+if [ "$2" != "-1" ]; then
  source ./parse_params.sh $2
  output_param_file="params_file.txt_$(date +"%F%T.%6N")"
  source ./write_params.sh 
@@ -15,12 +15,15 @@ if [ -n	"$2" ]; then
  run_folder_prev=${run_ad_folder}
 fi
 
+if [ -n "$3" ]; then
+ tap=$3
+fi
 
 source ./parse_params.sh $1
 
 output_param_file="params_file.txt_$(date +"%F%T.%6N")"
 source ./write_params.sh
-source ./get_run_folders.sh
+source ./get_run_folders.sh 
 
 # Print the next available folder name
 run_folder=${run_ad_folder}
@@ -291,6 +294,13 @@ mv data.streamice.temp data.streamice
 sed "s/.*streamice_wgt_tikh_beta.*/$strtikhbeta/" data.streamice > data.streamice.temp
 mv data.streamice.temp data.streamice
 
+if [ -n "$3" ]; then
+strad=" streamice_nonlin_tol_adjoint_rl = 1.e-3"
+sed "s/.*streamice_nonlin_tol_adjoint_rl =.*/$strad/" data.streamice > data.streamice.temp
+mv data.streamice.temp data.streamice
+fi
+
+
 
 sed "s/.*deltaT.*/$strdt/" data > data.streamice.temp
 mv data.streamice.temp data
@@ -311,6 +321,7 @@ cd ../archer_scripts; python remove_constraint.py 0.3 $timestep; cd $OLDPWD
 
 
 ln -s ../$build_dir/mitgcmuv_ad .
+echo $build_dir
 
 
 module load PrgEnv-gnu
