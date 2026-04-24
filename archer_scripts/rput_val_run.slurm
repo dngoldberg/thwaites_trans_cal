@@ -19,50 +19,23 @@ echo Sync start `date` >> times
 echo Sync start seconds `date +%s` >> times
 
 run_folder=$1
+exp_folder=$2
 
 cd $SLURM_SUBMIT_DIR/..
 rm U.* V.* T.* S.* W.* hFac*
-tar -czvf ${run_folder}.tgz ${run_folder}/*.meta ${run_folder}/STDOUT.0000 ${run_folder}/*.data ${run_folder}/err ${run_folder}/out
+tar -czvf ${run_folder}.tgz ${run_folder}/*.meta ${run_folder}/STDOUT.0000 ${run_folder}/*.data ${run_folder}/err ${run_folder}/out ${run_folder}/params_file.txt
 
 if [ $HOMEHOST != 'null' ] ; then
 
-  HOMEDIR=$HOMEROOT/THWAITES
+  HOMEDIR=$HOMEROOT/THWAITES/${exp_folder}
 
   echo home folder $HOMEDIR
 
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "mkdir -p $HOMEDIR"
-#  scp -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos $i.tgz $HOMEHOST:$HOMEDIR
   rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -p6022" -avzL --remove-source-files ${run_folder}.tgz $HOMEHOST:$HOMEDIR
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; tar -xzvf \"${run_folder}\".tgz"
   ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd $HOMEDIR; rm \"${run_folder}\".tgz"
-  ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/plotting_scripts; bash run_gen.sh" 
-
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL *crash* $HOMEHOST:$HOMEDIR
-
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Lsurfdiag $HOMEHOST:$HOMEDIR/$run_folder
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Ldyndiag $HOMEHOST:$HOMEDIR/$run_folder
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Ocestate $HOMEHOST:$HOMEDIR/$run_folder
-
-#  rsync -e "ssh -l dgoldber -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos" -avzL --remove-source-files $Lstdoutoce $HOMEHOST:$HOMEDIR/$run_folder
-
-#  process_id=$!
-#  wait $process_id
-#  rm $Lsurfdiag
-
-
-#  process_id=$!
-#  wait $process_id
-#  rm $Lstdout
-
-#  process_id=$!
-#  wait $process_id
-#  rm $Ocestate
-
-#  rsync -avzL stateSalt.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateRho.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateUvel.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateVvel.nc $HOMEHOST:$HOMEDIR
-#  rsync -avzL stateWvel.nc $HOMEHOST:$HOMEDIR
+  ssh -p6022 -i /home/n02/n02/dngoldbe/.ssh/id_rsa_cirrus_geos -t $HOMEHOST "cd /home/dgoldber/network_links/geosIceOcean/dgoldber/MITgcm_forinput/thwaites_trans_cal/batch_scripts; bash process_dir.sh $HOMEDIR/\"${run_folder}\" \"${exp_folder}\""
 
 fi
 

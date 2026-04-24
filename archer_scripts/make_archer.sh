@@ -38,7 +38,7 @@ fi
 
 
 cd $ROOTDIR
-#git checkout master
+git checkout branch_streamice_generic_ctrl_reg
 cd $OLDPWD
 
 

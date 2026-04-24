@@ -15,7 +15,7 @@
  writeBinaryPrec=64,
  hFacMin=.05,
  hFacMindz=50.,
- debugLevel=4,
+ debugLevel=3,
  momstepping=.FALSE.,
  tempstepping=.FALSE.,
  saltstepping=.FALSE.,
